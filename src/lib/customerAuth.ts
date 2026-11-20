@@ -138,12 +138,33 @@ export function unauthorized() {
 export const LOGIN_TOKEN_COOKIE = "carelink_login";
 const TOKEN_TTL_MS = 15 * 60 * 1000;
 
+let cachedBotNumber: string | null = null;
+/** The WhatsApp number the AI answers on (the one whose id is WHATSAPP_CARELINK_PHONE_NUMBER_ID), read from Meta once. */
+async function carelinkBotNumber(): Promise<string> {
+  if (cachedBotNumber) return cachedBotNumber;
+  const id = process.env.WHATSAPP_CARELINK_PHONE_NUMBER_ID || process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const token = process.env.WHATSAPP_TOKEN || process.env.WHATSAPP_ACCESS_TOKEN;
+  if (id && token) {
+    try {
+      const r = await fetch(`https://graph.facebook.com/${process.env.WHATSAPP_API_VERSION || "v21.0"}/${id}?fields=display_phone_number`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const j = (await r.json().catch(() => null)) as { display_phone_number?: string } | null;
+      const digits = (j?.display_phone_number ?? "").replace(/\D/g, "");
+      if (digits) return (cachedBotNumber = digits);
+    } catch (e) {
+      console.warn("[shop] could not read the CareLink number from Meta", e);
+    }
+  }
+  return (process.env.CARELINK_CONTACT_WHATSAPP ?? "").replace(/\D/g, "");
+}
+
 export async function startWhatsAppLogin(): Promise<{ token: string; waLink: string | null }> {
   const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   let token = "CL-";
   for (let i = 0; i < 6; i++) token += alphabet[crypto.randomInt(0, alphabet.length)];
   await logAudit({ userId: null, action: "customer.login.start", entity: `LoginToken:${token}`, newValue: { exp: Date.now() + TOKEN_TTL_MS } });
-  const number = (process.env.CARELINK_CONTACT_WHATSAPP ?? "").replace(/\D/g, "");
+  const number = await carelinkBotNumber();
   const text = `رمز الدخول إلى تطبيق Carelink: ${token}`;
   return { token, waLink: number ? `https://wa.me/${number}?text=${encodeURIComponent(text)}` : null };
 }
