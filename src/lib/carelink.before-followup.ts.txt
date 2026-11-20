@@ -1,0 +1,269 @@
+/**
+ * Phase 7 (CareLink) preparatory step — see README's "What's prepared for Phase 7" section
+ * for the full discrepancy this resolves around. Short version: the plan doc's original
+ * `CarelinkJob` model guessed at file-management-style job types (classify_files,
+ * find_duplicates, create_folder) before any real data existed. This session's uploaded
+ * branch list instead shows "Carelink ديلفري" as a single phone/WhatsApp number for
+ * "كافة المناطق" (all areas) — i.e. a general delivery contact, the same category as
+ * شركة المختار (Beirut) and الجواد كير/العاصي's own lines (see src/lib/aiTools.ts's
+ * create_delivery). Asked directly whether CareLink is ONLY this contact or whether a
+ * separate file-management platform also exists under that name, the user answered "لا
+ * تفضيل" (no preference) — so this is NOT resolved, and nothing here assumes an answer.
+ *
+ * What this file deliberately does and doesn't do:
+ * - Gives any future caller (a dispatcher screen, a tool, a report) ONE place to read the
+ *   real contact from, instead of reading `process.env.CARELINK_CONTACT_WHATSAPP` directly
+ *   in several places.
+ * - Does NOT wire this into create_delivery's fallback logic automatically — unlike
+ *   الجواد كير/العاصي/شركة المختار (tied to specific, named branches the user gave this
+ *   session), nobody has asked for "any branch with no specific contact falls back to
+ *   CareLink" as a rule, and that would be inventing a routing rule the data doesn't
+ *   explicitly back, same discipline assign_pharmacy's own comment already applies to
+ *   geo-distance branch selection. If you want that behavior, say so and it's a small change
+ *   here plus one line in create_delivery.
+ * - Does NOT build a `CareLinkAdapter`/API client of any kind — there is still no evidence
+ *   of a real API to adapt, and building one on spec would be exactly the "invent a fake
+ *   API" problem this project avoids throughout. If a real separate CareLink platform does
+ *   turn out to exist, ITS Adapter is a different, not-yet-started piece of work — this file
+ *   only covers the phone-contact reading.
+ */
+export interface CareLinkContact {
+  whatsapp: string;
+  label: string;
+  coverage: string;
+}
+
+export function getCareLinkContact(): CareLinkContact | null {
+  const whatsapp = process.env.CARELINK_CONTACT_WHATSAPP;
+  if (!whatsapp) return null;
+  return { whatsapp, label: "Carelink ديلفري", coverage: "كافة المناطق" };
+}
+
+// ---------------------------------------------------------------------------
+// UPDATE (this session): the "no preference" questions above are resolved. The user gave the
+// full real flow, verbatim: "استقبال carelink للطلبات تتم من خلال اتصال الزبون على الرقم
+// الخاص لـ carelink ووكيل الذكاء الاصطناعي يقوم بالجواب على الرسالة بحيث يمكنه الدخول الى
+// مخزون الصيدليات ويبحث عن المنتج ومن ثم يرسل رسالة للصيدلية بحجز المنتج ولدى رد الصيدلية
+// وتزويده بالسعر يعود وكيل الذكاء الاصطناعي ويعلم الزبون بالسعر وعند الموافقة يتصل الذكاء
+// الاصطناعي برقم الديلفري ويعلمه بالعنوان واي صيدلية الطلب" — and confirmed every step is
+// WhatsApp/text, never a real voice call. What's below is the real implementation of the one
+// step that doesn't fit anywhere else: receiving and parsing a BRANCH's WhatsApp reply to a
+// CarelinkInquiry (schema.prisma) and resuming the AI conversation that's waiting on it. The
+// rest of the flow (asking the branch, notifying delivery) lives in src/lib/aiTools.ts as
+// ordinary AI Tools (request_branch_reservation, notify_carelink_delivery) since those are
+// AI-initiated actions, not inbound-webhook-triggered ones like this.
+// ---------------------------------------------------------------------------
+
+import { prisma } from "@/lib/prisma";
+import { appendInboundMessage } from "@/lib/conversations";
+import { sendTextMessage } from "@/lib/whatsapp";
+import { CarelinkInquiryStatus, MessageType } from "@prisma/client";
+
+/**
+ * Best-effort extraction of a price from a branch's free-text WhatsApp reply (e.g. "متوفر،
+ * السعر 4.50$" or "نعم فيه، 150000 ل.ل"). Deliberately simple — the first decimal-or-integer
+ * number in the text, optionally followed by a currency word/symbol which is ignored (we don't
+ * attempt currency conversion/detection, since nothing in this project has asked for
+ * multi-currency pricing and Inventory.price has no currency field of its own either). Returns
+ * null when nothing number-shaped is found, which the caller treats as NEEDS_REVIEW rather than
+ * guessing a price — see CarelinkInquiry's schema comment for why this is intentionally
+ * conservative rather than "smarter."
+ */
+export function parsePriceFromText(text: string): number | null {
+  // 1) Remove our own reference code (CLK-7F3A2K) — its digits are not a price.
+  let t = text.replace(/CLK-[A-Z0-9]{4,}/gi, " ");
+  // 2) Arabic-Indic / Persian digits -> ASCII.
+  t = t.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660));
+  t = t.replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0));
+  t = t.replace(/\u066B/g, ".").replace(/\u066C/g, ",");
+  // 3) Thousands separators: 150,000 / 150.000 / 1,500,000 -> 150000 / 1500000 (exactly 3 digits after).
+  t = t.replace(/(\d)[,.](?=\d{3}(?!\d))/g, "$1");
+  // 4) "150 الف" / "150k" -> 150000.
+  t = t.replace(/(\d+(?:\.\d+)?)\s*(?:ألف|الف|آلاف|الاف|k)(?![A-Za-z؀-ۿ])/gi, (_m, n) => String(Math.round(parseFloat(n) * 1000)));
+
+  const num = "(\\d+(?:[.,]\\d{1,2})?)";
+  // Prefer a number the pharmacy tied to the word "price" ...
+  const priced = t.match(new RegExp("(?:السعر|سعر|بسعر|سعره|price)\\D{0,12}" + num, "i"));
+  // ... or to a currency.
+  const withCurrency =
+    t.match(new RegExp(num + "\\s*(?:ل\\.?\\s?ل|ليرة|الف ليرة|lbp|\\$|usd|دولار|دولارات)", "i")) ||
+    t.match(new RegExp("(?:\\$|usd)\\s*" + num, "i"));
+  const pick = priced?.[1] ?? withCurrency?.[1];
+  if (pick) {
+    const v = parseFloat(pick.replace(",", "."));
+    return Number.isFinite(v) && v > 0 ? v : null;
+  }
+  // No cue: accept only when there is exactly ONE number (otherwise quantity vs price is ambiguous
+  // -> null -> NEEDS_REVIEW, never a guess).
+  const all = t.match(/\d+(?:[.,]\d{1,2})?/g) ?? [];
+  if (all.length !== 1) return null;
+  const v = parseFloat(all[0].replace(",", "."));
+  return Number.isFinite(v) && v > 0 ? v : null;
+}
+
+/**
+ * WhatsApp Business "away"/greeting auto-replies a pharmacy's line may send back on its own
+ * (e.g. "Thank you for your message. We're unavailable right now, but will respond as soon as
+ * possible") — never an answer, must not close an inquiry.
+ */
+export function looksLikeAutoReply(text: string): boolean {
+  return /(thank\s*you\s*for\s*(your\s*)?(message|contacting)|will\s*(respond|reply|get\s*back)|we(?:'|’)?re\s*(currently\s*)?(unavailable|away|closed)|out\s*of\s*office|نشكركم\s*على\s*(رسالتكم|تواصلكم)|شكراً?\s*لتواصلك|سنقوم\s*بالرد|سنرد\s*عليك|خارج\s*(أوقات|اوقات)\s*العمل)/i.test(text);
+}
+
+/** Normalises a reference code for tolerant matching (O->0, I/L->1). */
+export function normalizeRefCode(code: string): string {
+  return code.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1");
+}
+
+/** Pharmacy says the item is NOT available (checked before "available", since "غير متوفر" contains "متوفر"). */
+export function looksUnavailable(text: string): boolean {
+  return /(غير\s*متوفر|مش\s*متوفر|غير\s*موجود|مش\s*موجود|مو\s*موجود|خلص|ما\s*(?:في|فيه|عنا|عندنا|عنده)|مافي|خالص|منتهي|مقطوع|نافد|ما\s*توفر|not\s*available|out\s*of\s*stock)/i.test(text);
+}
+
+/** Does a free-text pharmacy message look like a real answer (a number or an availability word)? */
+export function looksLikeStockAnswer(text: string): boolean {
+  if (looksLikeAutoReply(text) && !/CLK-[A-Z0-9]{4,}/i.test(text)) return false;
+  const t = text.replace(/CLK-[A-Z0-9]{4,}/gi, " ");
+  if (/[0-9\u0660-\u0669\u06F0-\u06F9]/.test(t)) return true;
+  if (looksUnavailable(t)) return true;
+  return /(متوفر|موجود|متاح|available|in\s*stock|\byes\b|\bno\b|نعم|ايوا|أيوا|اه\b|لا\b)/i.test(t);
+}
+
+/**
+ * Called by the webhook (src/app/api/whatsapp/webhook/route.ts) when an inbound WhatsApp
+ * message's sender matches a Branch's OWN whatsappNumber while the receiving number is
+ * CareLink's — i.e. this is a pharmacy replying to a reservation request, not a customer
+ * writing in. Matches it to the right CarelinkInquiry (by `referenceCode` if the branch quoted
+ * it back, else the branch's latest PENDING inquiry — see the schema comment for why that
+ * fallback is a known, documented limitation and not a guess at new behavior), records the
+ * reply, and resumes the ORIGINAL CareLink conversation so the AI can relay the price (or ask
+ * the customer for a bit more time, if the price couldn't be parsed) — exactly the same
+ * "process one inbound event, append a message, run the AI" shape the webhook already uses
+ * for real customer messages, just triggered by a different sender.
+ */
+export async function handleCarelinkBranchReply(input: {
+  branchId: string;
+  content: string;
+  waMessageId?: string;
+}): Promise<boolean> {
+  const { branchId, content, waMessageId } = input;
+
+  const codeMatch = content.match(/CLK-[A-Z0-9]{4,}/i);
+  const liveStatuses = [CarelinkInquiryStatus.PENDING, CarelinkInquiryStatus.NEEDS_REVIEW, CarelinkInquiryStatus.ANSWERED];
+  let inquiry = codeMatch
+    ? await prisma.carelinkInquiry.findFirst({
+        where: { branchId, referenceCode: codeMatch[0].toUpperCase(), status: { in: liveStatuses } },
+      })
+    : null;
+  // Pharmacies retype the code by hand: O/0 and I/1 get swapped. Compare codes ignoring those.
+  if (!inquiry && codeMatch) {
+    const want = normalizeRefCode(codeMatch[0]);
+    const candidates = await prisma.carelinkInquiry.findMany({
+      where: { branchId, status: { in: liveStatuses } },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+    });
+    inquiry = candidates.find((c: { referenceCode: string }) => normalizeRefCode(c.referenceCode) === want) ?? null;
+  }
+
+  if (!inquiry) {
+    // No reference code quoted. Only treat the message as an answer when it actually looks like one
+    // (a number or an availability word) — otherwise chatter such as "Test" / "شكراً" would wrongly
+    // close a real pending inquiry. Chatter is stored in the inbox by the webhook (return false).
+    if (!looksLikeStockAnswer(content)) {
+      console.warn(`[carelink] رسالة من فرع (${branchId}) لا تبدو جواباً عن سعر/توفر — تُحفظ بلا ربط: "${content}"`);
+      return false;
+    }
+    inquiry = await prisma.carelinkInquiry.findFirst({
+      where: { branchId, status: CarelinkInquiryStatus.PENDING },
+      orderBy: { createdAt: "desc" },
+    });
+    // A clear price can also upgrade a recent NEEDS_REVIEW inquiry (e.g. one wrongly closed by an
+    // earlier "Test" reply) when nothing is pending for this branch.
+    if (!inquiry && parsePriceFromText(content) !== null) {
+      inquiry = await prisma.carelinkInquiry.findFirst({
+        where: {
+          branchId,
+          status: CarelinkInquiryStatus.NEEDS_REVIEW,
+          createdAt: { gt: new Date(Date.now() - 24 * 3600 * 1000) },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }
+  }
+
+  if (!inquiry) {
+    // No open ask for this branch — most likely a branch replying to something unrelated on
+    // the same WhatsApp line, or a reply that arrived after the inquiry was already resolved.
+    // Logged, not thrown: a webhook event with nothing to attach to is a normal outcome here,
+    // not a failure.
+    console.warn(
+      `[carelink] رد وارد من فرع (${branchId}) بلا طلب حجز معلّق (PENDING) ليُطابقه — يُحفظ في المحادثات بلا رد آلي: "${content}"`
+    );
+    // false = nothing to resume; the webhook stores the message in the inbox (no AI answer) so the team sees it.
+    return false;
+  }
+
+  // The pharmacy quoted our code but said nothing useful (e.g. just "CLK-X08S0U", or "شكراً CLK-..."):
+  // it is an acknowledgement, not an answer. Ask it for the price right back (we are inside its 24h
+  // window because it just wrote to us) and leave the inquiry PENDING — the AI is not woken up.
+  if (codeMatch && !looksLikeStockAnswer(content)) {
+    try {
+      const b = await prisma.branch.findUnique({ where: { id: branchId }, select: { whatsappNumber: true } });
+      if (b?.whatsappNumber) {
+        await sendTextMessage(
+          b.whatsappNumber,
+          `شكراً. بخصوص الطلب ${inquiry.referenceCode}: هل الصنف متوفر وما سعره؟ الرجاء الرد برقم السعر (مثال: متوفر، السعر 150000 ل.ل).`,
+          { fromPhoneNumberId: process.env.WHATSAPP_CARELINK_PHONE_NUMBER_ID }
+        );
+      }
+    } catch (e) {
+      console.warn("[carelink] تعذّر طلب السعر من الفرع بعد رد غير مكتمل", e);
+    }
+    return true;
+  }
+
+  const quotedPrice = parsePriceFromText(content);
+
+  await prisma.carelinkInquiry.update({
+    where: { id: inquiry.id },
+    data: {
+      status: quotedPrice !== null ? CarelinkInquiryStatus.ANSWERED : CarelinkInquiryStatus.NEEDS_REVIEW,
+      quotedPrice: quotedPrice ?? undefined,
+      rawReply: content,
+      answeredAt: new Date(),
+    },
+  });
+
+  const unavailable = quotedPrice === null && looksUnavailable(content);
+  const note = unavailable
+    ? `[رد الفرع] الصنف (الرمز ${inquiry.referenceCode}) غير متوفر لدى هذا الفرع. أبلغ الزبون واقترح بديلاً أو اسأل صيدلية أخرى. النص الكامل: "${content}"`
+    : quotedPrice !== null
+      ? `[رد الفرع] تأكيد الحجز للرمز ${inquiry.referenceCode} — السعر المعروض: ${quotedPrice} (الكمية المطلوبة: ${inquiry.qty}). النص الكامل: "${content}"`
+      : `[رد الفرع - يحتاج مراجعة بشرية] (الرمز ${inquiry.referenceCode}) لم يُفهم السعر تلقائياً من رد الفرع. النص الكامل: "${content}"`;
+
+  // Persisted as a real WhatsappMessage (type SYSTEM, same enum value the webhook already
+  // uses for unsupported inbound types) so the full exchange stays visible in the normal
+  // conversation thread/inbox — a human looking at this CareLink conversation sees the
+  // customer's question, the AI's "checking with the pharmacy," this note, then the AI's
+  // follow-up — not a hidden side-channel only this code can see.
+  await appendInboundMessage({
+    conversationId: inquiry.conversationId,
+    type: MessageType.SYSTEM,
+    content: note,
+    waMessageId,
+  });
+
+  // Resume the AI turn on the CareLink conversation that was waiting — dynamically imported
+  // to avoid a circular import (aiOrchestrator.ts -> aiTools.ts -> carelink.ts would otherwise
+  // close a cycle back to aiOrchestrator.ts). Same best-effort error handling as the webhook's
+  // own call to runAiTurn(): a failed AI turn here must never throw back into the webhook
+  // handler processing this branch's message.
+  try {
+    const { runAiTurn } = await import("@/lib/aiOrchestrator");
+    await runAiTurn(inquiry.conversationId);
+  } catch (e) {
+    console.error(`[carelink] فشل استكمال محادثة Carelink (${inquiry.conversationId}) بعد رد الفرع`, e);
+  }
+  return true;
+}

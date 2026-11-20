@@ -1,0 +1,226 @@
+
+/* ============================================================
+   الشكل الرقمي (Digital) — طبقة شكلية فقط، لا تغيّر أي منطق أو بيانات.
+   html.digital          : فاتح بألوان الصيدلية (أخضر + أبيض) — الافتراضي
+   html.digital.night    : داكن (للعمل الليلي)
+   بدون الصنف digital    : الشكل الكلاسيكي
+   ============================================================ */
+html { scrollbar-gutter: stable; }
+/* ثبات العرض: شريط التمرير الداخلي ظاهر دائماً فلا يتغيّر عرض المحتوى عند التحميل */
+.digital main { overflow-y: scroll; }
+.dx-clock { display: none; }
+
+.digital {
+  color-scheme: light;
+  --digit: var(--font-rajdhani), "Rajdhani", var(--font-tajawal), sans-serif;
+  --ink: #0f2a24; --line: #c3ddd1; --surface-2: #e5f5ed; --sun: #0f9d73; --accent: #0f9d73;
+  --dx-card-a: #ffffff; --dx-card-b: #f4fbf8;
+  --dx-edge: rgba(16, 150, 110, 0.30); --dx-edge-soft: rgba(16, 150, 110, 0.20); --dx-edge-hi: rgba(16, 150, 110, 0.60);
+  --dx-glow: 0 8px 24px -14px rgba(16, 110, 85, 0.40);
+  --dx-t9: #0f2a24; --dx-t7: #284a41; --dx-t6: #3c5d54; --dx-t5: #52726a; --dx-t4: #5b786f; --dx-t3: #8fb0a5;
+  --dx-ink-text: #0a6a4c; --dx-brand-text: #0a7a58; --dx-brand-text-soft: #0a6a4c;
+  --dx-rose: #c92c47; --dx-emerald: #0b7a4f; --dx-amber: #8f5a00; --dx-sky: #1d6fb8;
+  --dx-slate50: rgba(15, 157, 115, 0.06); --dx-slate100: rgba(15, 157, 115, 0.11); --dx-slate400: #8aa59b;
+  --dx-brand-bg: rgba(15, 157, 115, 0.12); --dx-emerald-bg: rgba(18, 161, 80, 0.13);
+  --dx-amber-bg: rgba(245, 170, 30, 0.18); --dx-rose-bg: rgba(220, 60, 90, 0.10); --dx-sky-bg: rgba(47, 125, 225, 0.12);
+  --dx-d-brand: #0f9d73; --dx-d-emerald: #12a150; --dx-d-amber: #e08a00; --dx-d-rose: #d6345a; --dx-d-sky: #2f7de1; --dx-d-violet: #6d5bd0; --dx-d-indigo: #4f5bd5;
+  --dx-primary: linear-gradient(135deg, #14b98a, #0f9d73); --dx-primary-ink: #ffffff; --dx-primary-glow: 0 6px 18px -6px rgba(15, 157, 115, 0.75);
+  --dx-btn-bg: rgba(15, 157, 115, 0.08); --dx-btn-text: #0a6a4c; --dx-btn-edge: rgba(15, 157, 115, 0.45); --dx-btn-hover: rgba(15, 157, 115, 0.16);
+  --dx-input-bg: #ffffff; --dx-popover: #ffffff; --dx-backdrop: rgba(10, 40, 32, 0.45);
+  --dx-aside: linear-gradient(180deg, #ffffff, #ecf8f2);
+  --dx-active: linear-gradient(270deg, rgba(15, 157, 115, 0.20), rgba(15, 157, 115, 0.05)); --dx-active-text: #08684a;
+  --dx-th-bg: #e0f4ea; --dx-th-text: #0a6a4c; --dx-row-hover: rgba(15, 157, 115, 0.07); --dx-row-line: rgba(16, 150, 110, 0.15);
+  --dx-num-glow: 0 0 14px rgba(16, 185, 129, 0.26);
+  --dx-clock: #0a7a58; --dx-clock-glow: 0 0 12px rgba(16, 185, 129, 0.35);
+  --dx-live: #0b8f5f; --dx-scroll: #a9d6c5;
+  --dx-bg-line: rgba(15, 157, 115, 0.06);
+  --dx-bg-a: radial-gradient(900px 500px at 90% -10%, rgba(18, 184, 134, 0.14), transparent 60%);
+  --dx-bg-b: radial-gradient(800px 520px at -6% 108%, rgba(14, 154, 160, 0.12), transparent 60%);
+  --dx-page: linear-gradient(160deg, #f4fbf8, #eaf6f1 55%, #eff7fb);
+  --dx-mark: linear-gradient(135deg, #14b98a, #0f9d73); --dx-mark-ink: #ffffff;
+}
+.digital.night {
+  color-scheme: dark;
+  --ink: #e8f3ff; --line: #1e3566; --surface-2: #0f1e48; --sun: #22d3ee; --accent: #22d3ee;
+  --dx-card-a: rgba(17, 33, 76, 0.80); --dx-card-b: rgba(8, 17, 40, 0.93);
+  --dx-edge: rgba(56, 189, 248, 0.30); --dx-edge-soft: rgba(56, 189, 248, 0.20); --dx-edge-hi: rgba(34, 211, 238, 0.60);
+  --dx-glow: 0 0 22px -6px rgba(34, 211, 238, 0.45);
+  --dx-t9: #eef7ff; --dx-t7: #cfe0f7; --dx-t6: #a3b9dc; --dx-t5: #8aa2c8; --dx-t4: #7790ba; --dx-t3: #556b94;
+  --dx-ink-text: #8ff3ff; --dx-brand-text: #67e8f9; --dx-brand-text-soft: #cffafe;
+  --dx-rose: #ff8da3; --dx-emerald: #34f5a1; --dx-amber: #ffc447; --dx-sky: #7dd3fc;
+  --dx-slate50: rgba(120, 150, 210, 0.09); --dx-slate100: rgba(120, 150, 210, 0.14); --dx-slate400: #5a74a6;
+  --dx-brand-bg: rgba(34, 211, 238, 0.12); --dx-emerald-bg: rgba(52, 245, 161, 0.12);
+  --dx-amber-bg: rgba(255, 196, 71, 0.12); --dx-rose-bg: rgba(255, 92, 122, 0.14); --dx-sky-bg: rgba(96, 165, 250, 0.14);
+  --dx-d-brand: #22d3ee; --dx-d-emerald: #34f5a1; --dx-d-amber: #ffc447; --dx-d-rose: #ff5c7a; --dx-d-sky: #60a5fa; --dx-d-violet: #a78bfa; --dx-d-indigo: #7c8bff;
+  --dx-primary: linear-gradient(135deg, #22d3ee, #4f9dff); --dx-primary-ink: #021019; --dx-primary-glow: 0 0 20px -4px rgba(34, 211, 238, 0.7);
+  --dx-btn-bg: rgba(34, 211, 238, 0.07); --dx-btn-text: #c4f4ff; --dx-btn-edge: rgba(34, 211, 238, 0.38); --dx-btn-hover: rgba(34, 211, 238, 0.16);
+  --dx-input-bg: #07112b; --dx-popover: #0b1d44; --dx-backdrop: rgba(2, 6, 17, 0.72);
+  --dx-aside: linear-gradient(180deg, rgba(9, 19, 43, 0.92), rgba(4, 8, 19, 0.96));
+  --dx-active: linear-gradient(270deg, rgba(34, 211, 238, 0.20), rgba(34, 211, 238, 0.04)); --dx-active-text: #7ef0ff;
+  --dx-th-bg: rgba(34, 211, 238, 0.10); --dx-th-text: #8fe9ff; --dx-row-hover: rgba(34, 211, 238, 0.07); --dx-row-line: rgba(56, 189, 248, 0.10);
+  --dx-num-glow: 0 0 16px rgba(34, 211, 238, 0.42);
+  --dx-clock: #8ff3ff; --dx-clock-glow: 0 0 14px rgba(34, 211, 238, 0.7);
+  --dx-live: #34f5a1; --dx-scroll: #1c3a74;
+  --dx-bg-line: rgba(56, 189, 248, 0.045);
+  --dx-bg-a: radial-gradient(900px 500px at 88% -8%, rgba(34, 211, 238, 0.13), transparent 60%);
+  --dx-bg-b: radial-gradient(800px 520px at -6% 108%, rgba(167, 139, 250, 0.13), transparent 60%);
+  --dx-page: linear-gradient(160deg, #040813, #061029 55%, #080a26);
+  --dx-mark: linear-gradient(135deg, #0b2a63, #0e4f78); --dx-mark-ink: #8ff3ff;
+}
+
+.digital body {
+  color: var(--dx-t9);
+  background:
+    var(--dx-bg-a), var(--dx-bg-b),
+    linear-gradient(var(--dx-bg-line) 1px, transparent 1px) 0 0 / 42px 42px,
+    linear-gradient(90deg, var(--dx-bg-line) 1px, transparent 1px) 0 0 / 42px 42px,
+    var(--dx-page) fixed;
+  background-attachment: fixed;
+}
+.digital h1, .digital h2, .digital h3, .digital h4, .digital .font-display {
+  font-family: var(--font-tajawal), "Tahoma", sans-serif;
+  letter-spacing: 0;
+}
+
+/* الخلفيات */
+.digital .bg-white { background: linear-gradient(160deg, var(--dx-card-a), var(--dx-card-b)); }
+.digital input.bg-white, .digital select.bg-white, .digital textarea.bg-white { background: var(--dx-input-bg); }
+.digital .bg-slate-50 { background: var(--dx-slate50); }
+.digital .bg-slate-100 { background: var(--dx-slate100); }
+.digital .bg-slate-400 { background: var(--dx-slate400); }
+.digital .bg-sun { background: var(--dx-brand-bg); }
+.digital .bg-sun\/40 { background: var(--dx-brand-bg); }
+.digital .bg-brand-50, .digital .bg-brand-100 { background: var(--dx-brand-bg); }
+.digital .bg-emerald-50, .digital .bg-emerald-100 { background: var(--dx-emerald-bg); }
+.digital .bg-amber-50, .digital .bg-amber-100 { background: var(--dx-amber-bg); }
+.digital .bg-rose-50, .digital .bg-rose-100 { background: var(--dx-rose-bg); }
+.digital .bg-sky-50, .digital .bg-sky-100 { background: var(--dx-sky-bg); }
+.digital .bg-brand-600 { background: var(--dx-primary); color: var(--dx-primary-ink); box-shadow: var(--dx-primary-glow); }
+.digital .bg-brand-600.text-white { color: var(--dx-primary-ink); }
+.digital .bg-brand-500 { background: var(--dx-d-brand); }
+.digital .bg-sky-500 { background: var(--dx-d-sky); }
+.digital .bg-emerald-500 { background: var(--dx-d-emerald); }
+.digital .bg-amber-500 { background: var(--dx-d-amber); }
+.digital .bg-rose-500 { background: var(--dx-d-rose); }
+.digital .bg-violet-500 { background: var(--dx-d-violet); }
+.digital .bg-indigo-500 { background: var(--dx-d-indigo); }
+
+/* النصوص */
+.digital .text-slate-900, .digital .text-slate-800 { color: var(--dx-t9); }
+.digital .text-slate-700 { color: var(--dx-t7); }
+.digital .text-slate-600 { color: var(--dx-t6); }
+.digital .text-slate-500 { color: var(--dx-t5); }
+.digital .text-slate-400 { color: var(--dx-t4); }
+.digital .text-slate-300 { color: var(--dx-t3); }
+.digital .text-ink { color: var(--dx-ink-text); }
+.digital .text-brand-500, .digital .text-brand-600, .digital .text-brand-700, .digital .text-brand-800 { color: var(--dx-brand-text); }
+.digital .text-brand-100 { color: var(--dx-brand-text-soft); }
+.digital .text-rose-600, .digital .text-rose-700 { color: var(--dx-rose); }
+.digital .text-emerald-700, .digital .text-emerald-800 { color: var(--dx-emerald); }
+.digital .text-amber-700, .digital .text-amber-800 { color: var(--dx-amber); }
+.digital .text-sky-700, .digital .text-sky-800 { color: var(--dx-sky); }
+.digital .placeholder\:text-slate-400::placeholder { color: var(--dx-t4); opacity: 0.8; }
+
+/* الحدود */
+.digital .border-ink { border-color: var(--dx-edge); }
+.digital [class*="border-[2.5px]"] { border-width: 1px; }
+.digital .border-2 { border-width: 1px; }
+.digital .border-slate-300, .digital .border-slate-200 { border-color: var(--dx-edge-soft); }
+.digital .border-brand-600 { border-color: var(--dx-edge-hi); }
+.digital .border-emerald-600, .digital .border-emerald-700 { border-color: color-mix(in srgb, var(--dx-emerald) 60%, transparent); }
+.digital .border-amber-600, .digital .border-amber-700 { border-color: color-mix(in srgb, var(--dx-amber) 60%, transparent); }
+.digital .border-rose-500, .digital .border-rose-600 { border-color: color-mix(in srgb, var(--dx-rose) 60%, transparent); }
+.digital .border-sky-600, .digital .border-sky-700 { border-color: color-mix(in srgb, var(--dx-sky) 60%, transparent); }
+.digital .border-sky-500 { border-color: var(--dx-d-brand); }
+
+/* الظلال الصلبة القديمة → ظلال ناعمة */
+.digital .shadow-pop, .digital .shadow-pop-lg,
+.digital [class*="shadow-[0_6px"], .digital [class*="shadow-[0_5px"] { box-shadow: var(--dx-glow); }
+.digital .shadow-pop-sm, .digital [class*="shadow-[0_2px"], .digital [class*="shadow-[0_3px"] { box-shadow: none; }
+.digital [class*="hover:shadow-[0_"]:hover { box-shadow: 0 0 14px -4px var(--dx-d-brand); }
+.digital .bg-brand-600.shadow-pop-sm, .digital .bg-brand-600[class*="shadow-"] { box-shadow: var(--dx-primary-glow); }
+.digital [class*="-rotate-"] { transform: none; }
+.digital .hover\:-translate-y-0\.5:hover { transform: none; }
+
+/* الأزرار */
+.digital button.border-2 { border-color: var(--dx-btn-edge); }
+.digital button.bg-white { background: var(--dx-btn-bg); color: var(--dx-btn-text); }
+.digital button.bg-white:hover { background: var(--dx-btn-hover); border-color: var(--dx-edge-hi); box-shadow: 0 0 14px -4px var(--dx-d-brand); }
+.digital .hover\:bg-slate-100:hover, .digital .hover\:bg-slate-50:hover, .digital .hover\:bg-white:hover { background: var(--dx-brand-bg); }
+.digital .hover\:bg-rose-50:hover { background: var(--dx-rose-bg); }
+.digital .hover\:bg-sun\/30:hover { background: var(--dx-brand-bg); }
+.digital .hover\:border-ink:hover { border-color: var(--dx-edge-hi); }
+.digital .hover\:text-slate-900:hover { color: var(--dx-t9); }
+.digital .hover\:text-slate-600:hover { color: var(--dx-t7); }
+.digital .hover\:text-rose-600:hover { color: var(--dx-rose); }
+.digital .hover\:brightness-105:hover { filter: brightness(1.08); }
+.digital button.bg-sun { background: var(--dx-primary); color: var(--dx-primary-ink); box-shadow: var(--dx-primary-glow); }
+.digital .disabled\:bg-brand-300:disabled { background: var(--dx-slate100); color: var(--dx-t3); box-shadow: none; }
+.digital .disabled\:bg-white:disabled, .digital .disabled\:bg-slate-50:disabled { background: var(--dx-slate50); }
+.digital .disabled\:text-slate-400:disabled, .digital .disabled\:text-slate-300:disabled { color: var(--dx-t3); }
+.digital .disabled\:text-rose-300:disabled { color: var(--dx-t3); }
+.digital .disabled\:border-slate-300:disabled, .digital .disabled\:border-rose-200:disabled, .digital .disabled\:border-brand-300:disabled { border-color: var(--dx-edge-soft); }
+
+/* الحقول */
+.digital select, .digital input[type="text"], .digital input[type="number"], .digital input[type="date"],
+.digital input[type="month"], .digital input[type="password"], .digital input[type="email"],
+.digital input[type="search"], .digital input[type="tel"], .digital textarea {
+  background: var(--dx-input-bg); color: var(--dx-t9); border-width: 1px; border-color: var(--dx-edge);
+}
+.digital select:focus, .digital input:focus, .digital textarea:focus {
+  border-color: var(--dx-d-brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--dx-d-brand) 25%, transparent);
+}
+.digital option { background: var(--dx-input-bg); color: var(--dx-t9); }
+
+/* النوافذ */
+.digital .bg-slate-950\/55 { background: var(--dx-backdrop); }
+.digital .z-10.bg-white { background: var(--dx-popover); border-color: var(--dx-edge-hi); box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.4); }
+
+/* الشريط الجانبي والعلوي */
+.digital aside.bg-white { background: var(--dx-aside); box-shadow: var(--dx-glow); }
+.digital header.bg-white { box-shadow: var(--dx-glow); }
+.digital .pop-nav:hover { transform: none; }
+.digital .pop-nav.bg-sun {
+  background: var(--dx-active); border-color: var(--dx-edge-hi); color: var(--dx-active-text);
+  box-shadow: 0 0 14px -6px var(--dx-d-brand);
+}
+.digital aside .bg-brand-600 { background: var(--dx-mark); color: var(--dx-mark-ink); }
+.digital aside .bg-brand-600.text-white { color: var(--dx-mark-ink); }
+
+/* عنوان الصفحة */
+.digital h1.bg-sun { background: var(--dx-brand-bg); color: var(--dx-ink-text); border-color: var(--dx-edge-hi); box-shadow: none; }
+
+/* بطاقات الأرقام: خط رقمي */
+.digital .tabular-nums { font-family: var(--digit); letter-spacing: 0.02em; }
+.digital p.tabular-nums { text-shadow: var(--dx-num-glow); }
+.digital .text-3xl.tabular-nums { font-size: clamp(1.7rem, 2.3vw, 2.4rem); line-height: 1.1; font-weight: 700; min-height: 1.1em; overflow-wrap: anywhere; }
+.digital .grid > * { min-width: 0; }
+.digital .rounded-3xl.p-4.bg-brand-100 { box-shadow: 0 -8px 22px -16px var(--dx-d-brand); border-top-color: var(--dx-d-brand); }
+.digital .rounded-3xl.p-4.bg-amber-100 { box-shadow: 0 -8px 22px -16px var(--dx-d-amber); border-top-color: var(--dx-d-amber); }
+.digital .rounded-3xl.p-4.bg-rose-100 { box-shadow: 0 -8px 22px -16px var(--dx-d-rose); border-top-color: var(--dx-d-rose); }
+.digital .rounded-3xl.p-4.bg-emerald-100 { box-shadow: 0 -8px 22px -16px var(--dx-d-emerald); border-top-color: var(--dx-d-emerald); }
+.digital .rounded-3xl.p-4.bg-sky-100 { box-shadow: 0 -8px 22px -16px var(--dx-d-sky); border-top-color: var(--dx-d-sky); }
+
+/* الجدول الموحّد */
+.digital .pacc-table thead th { background: var(--dx-th-bg); color: var(--dx-th-text); border-bottom: 1px solid var(--dx-edge-hi); }
+.digital .pacc-table thead th:first-child, .digital .pacc-table thead th:last-child { border-radius: 0; }
+.digital .pacc-table tbody td { border-bottom: 1px solid var(--dx-row-line); }
+.digital .pacc-table tbody tr:hover { background-color: var(--dx-row-hover); }
+
+/* الشارات */
+.digital .rounded-full.border-2.px-2\.5 { border-width: 1px; }
+
+/* شريط التمرير */
+.digital * { scrollbar-color: var(--dx-scroll) transparent; }
+.digital ::-webkit-scrollbar-thumb { background-color: var(--dx-scroll); }
+
+/* الساعة والتبديل في الشريط العلوي */
+.dx-clock { align-items: center; gap: 10px; }
+.digital .dx-clock { display: flex; }
+.dx-clock .dx-time { font-family: var(--digit); font-size: 1.6rem; font-weight: 700; line-height: 1; min-width: 6.4ch; color: var(--dx-clock); letter-spacing: 0.06em; direction: ltr; text-shadow: var(--dx-clock-glow); }
+.dx-clock .dx-date { font-size: 11px; color: var(--dx-t6); line-height: 1.3; min-width: 9em; }
+.dx-live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--dx-live); }
+.dx-live i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; animation: dx-pulse 1.8s ease-in-out infinite; }
+@keyframes dx-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) { .dx-live i { animation: none; } }
+@media print { .digital { color-scheme: light; } .digital body { background: #fff; color: #000; } .dx-clock { display: none !important; } }

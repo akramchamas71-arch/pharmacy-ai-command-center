@@ -1,0 +1,400 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { api, ApiError } from "@/lib/apiClient";
+import { useHasPermission } from "@/lib/userContext";
+import { PERMISSION_KEYS } from "@/lib/permissionKeys";
+import {
+  PageHeader,
+  Card,
+  CardBody,
+  FullPageSpinner,
+  EmptyState,
+  Alert,
+  Button,
+  Modal,
+  Select,
+  Field,
+  Textarea,
+} from "@/components/ui";
+import { DeliveryStatusBadge } from "@/components/deliveries/DeliveryStatusBadge";
+import { DeliveryInvoiceModal } from "@/components/deliveries/DeliveryInvoice";
+import {
+  DELIVERY_STATUSES,
+  deliveryStatusLabel,
+  DELIVERY_ADVANCE_TRANSITIONS,
+  DELIVERY_REASSIGNABLE_FROM,
+  formatMoney,
+  type Delivery,
+  type DeliveryStatus,
+} from "@/components/deliveries/deliveryTypes";
+import type { Driver } from "@/components/drivers/driverTypes";
+import { driverAvailabilityLabel } from "@/components/drivers/driverTypes";
+import type { OrderSummary } from "@/components/orders/orderTypes";
+
+export default function DeliveriesPage() {
+  const canManage = useHasPermission(PERMISSION_KEYS.DELIVERY_MANAGE);
+
+  const [deliveries, setDeliveries] = useState<Delivery[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<DeliveryStatus | "ALL">("ALL");
+
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Assign-driver modal state (dispatcher explicitly assigning an in-app driver to a
+  // READY_FOR_DELIVERY order that has no delivery yet).
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [readyOrders, setReadyOrders] = useState<OrderSummary[] | null>(null);
+  const [drivers, setDrivers] = useState<Driver[] | null>(null);
+  const [assignOrderId, setAssignOrderId] = useState("");
+  const [assignDriverId, setAssignDriverId] = useState("");
+
+  // Reassign modal state (also doubles as the retry path for a FAILED delivery).
+  const [reassignTarget, setReassignTarget] = useState<Delivery | null>(null);
+  const [reassignDriverId, setReassignDriverId] = useState("");
+
+  // Customer invoice modal (printable, issued straight from the delivery row).
+  const [invoiceDeliveryId, setInvoiceDeliveryId] = useState<string | null>(null);
+
+  // Advance-status modal state.
+  const [advanceTarget, setAdvanceTarget] = useState<Delivery | null>(null);
+  const [advanceStatus, setAdvanceStatus] = useState<string>("");
+  const [advanceReason, setAdvanceReason] = useState("");
+
+  const loadDeliveries = useCallback(async () => {
+    if (!canManage) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const qs = new URLSearchParams();
+      if (statusFilter !== "ALL") qs.set("status", statusFilter);
+      const data = await api.get<{ deliveries: Delivery[] }>(`/api/deliveries?${qs.toString()}`);
+      setDeliveries(data.deliveries);
+    } catch (e) {
+      setLoadError(e instanceof ApiError ? e.message : "تعذّر تحميل التوصيلات");
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, canManage]);
+
+  useEffect(() => {
+    loadDeliveries();
+  }, [loadDeliveries]);
+
+  const tabs = useMemo(() => ["ALL" as const, ...DELIVERY_STATUSES], []);
+
+  // Orders that are READY_FOR_DELIVERY but don't already have a delivery row — computed by
+  // cross-referencing the two lists, since GET /api/orders doesn't include the `delivery`
+  // relation. ASSUMPTION flagged in the summary: this cross-reference approach (rather than a
+  // dedicated "unassigned orders" endpoint, which doesn't exist) is how this page finds
+  // assignable orders.
+  const assignableOrders = useMemo(() => {
+    if (!readyOrders) return [];
+    const assignedOrderIds = new Set((deliveries ?? []).map((d) => d.order.id));
+    return readyOrders.filter((o) => !assignedOrderIds.has(o.id));
+  }, [readyOrders, deliveries]);
+
+  async function openAssignModal() {
+    setActionError(null);
+    setAssignOrderId("");
+    setAssignDriverId("");
+    setAssignOpen(true);
+    try {
+      const [ordersData, driversData] = await Promise.all([
+        api.get<{ orders: OrderSummary[] }>("/api/orders?status=READY_FOR_DELIVERY&limit=200"),
+        api.get<{ drivers: Driver[] }>("/api/drivers"),
+      ]);
+      setReadyOrders(ordersData.orders);
+      setDrivers(driversData.drivers);
+    } catch (e) {
+      setActionError(e instanceof ApiError ? e.message : "تعذّر تحميل الطلبات أو السائقين");
+    }
+  }
+
+  async function handleAssign() {
+    if (!assignOrderId || !assignDriverId) return;
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      await api.post("/api/deliveries", { orderId: assignOrderId, driverId: assignDriverId });
+      setAssignOpen(false);
+      await loadDeliveries();
+    } catch (e) {
+      setActionError(e instanceof ApiError ? e.message : "تعذّر تعيين السائق");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  async function openReassignModal(delivery: Delivery) {
+    setActionError(null);
+    setReassignTarget(delivery);
+    setReassignDriverId("");
+    if (!drivers) {
+      try {
+        const driversData = await api.get<{ drivers: Driver[] }>("/api/drivers");
+        setDrivers(driversData.drivers);
+      } catch (e) {
+        setActionError(e instanceof ApiError ? e.message : "تعذّر تحميل قائمة السائقين");
+      }
+    }
+  }
+
+  async function handleReassign() {
+    if (!reassignTarget || !reassignDriverId) return;
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      await api.post(`/api/deliveries/${reassignTarget.id}/reassign`, { driverId: reassignDriverId });
+      setReassignTarget(null);
+      await loadDeliveries();
+    } catch (e) {
+      setActionError(e instanceof ApiError ? e.message : "تعذّر إعادة تعيين السائق");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  function openAdvanceModal(delivery: Delivery) {
+    setActionError(null);
+    setAdvanceTarget(delivery);
+    const options = DELIVERY_ADVANCE_TRANSITIONS[delivery.status] ?? [];
+    setAdvanceStatus(options[0] ?? "");
+    setAdvanceReason("");
+  }
+
+  async function handleAdvance() {
+    if (!advanceTarget || !advanceStatus) return;
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      await api.post(`/api/deliveries/${advanceTarget.id}/advance`, {
+        status: advanceStatus,
+        ...(advanceReason ? { reason: advanceReason } : {}),
+      });
+      setAdvanceTarget(null);
+      await loadDeliveries();
+    } catch (e) {
+      setActionError(e instanceof ApiError ? e.message : "تعذّر تحديث حالة التوصيل");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  if (!canManage) {
+    return (
+      <div>
+        <PageHeader title="التوصيلات" />
+        <Card>
+          <CardBody>
+            <EmptyState title="لا تملك صلاحية إدارة التوصيلات" />
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <PageHeader
+        title="التوصيلات"
+        description="تعيين السائقين وتتبّع حالة توصيل الطلبات"
+        action={<Button onClick={openAssignModal}>تعيين سائق لطلب</Button>}
+      />
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {tabs.map((s) => (
+          <button
+            key={s}
+            onClick={() => setStatusFilter(s)}
+            className={`rounded-full border-2 px-3.5 py-1.5 text-xs font-bold transition-all ${
+              statusFilter === s ? "border-ink bg-sun text-ink shadow-pop-sm" : "border-slate-300 bg-white text-slate-600 hover:border-ink hover:bg-slate-50"
+            }`}
+          >
+            {s === "ALL" ? "الكل" : deliveryStatusLabel(s)}
+          </button>
+        ))}
+      </div>
+
+      {actionError && (
+        <div className="mb-4">
+          <Alert tone="danger">{actionError}</Alert>
+        </div>
+      )}
+
+      <Card>
+        {loading ? (
+          <CardBody>
+            <FullPageSpinner label="جارِ تحميل التوصيلات..." />
+          </CardBody>
+        ) : loadError ? (
+          <CardBody>
+            <Alert tone="danger">{loadError}</Alert>
+          </CardBody>
+        ) : !deliveries || deliveries.length === 0 ? (
+          <CardBody>
+            <EmptyState
+              title="لا توجد توصيلات"
+              description="لا توجد توصيلات مطابقة لهذا الفلتر حالياً. استخدم زر «تعيين سائق لطلب» أعلى الصفحة لإنشاء توصيل جديد."
+            />
+          </CardBody>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="pacc-table">
+              <thead>
+                <tr>
+                  <th>رقم الطلب</th>
+                  <th>الفرع</th>
+                  <th>السائق</th>
+                  <th>الحالة</th>
+                  <th>المبلغ المطلوب تحصيله</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deliveries.map((d) => {
+                  const canReassign = DELIVERY_REASSIGNABLE_FROM.includes(d.status);
+                  const canAdvance = (DELIVERY_ADVANCE_TRANSITIONS[d.status] ?? []).length > 0;
+                  return (
+                    <tr key={d.id}>
+                      <td className="font-semibold text-slate-700">{d.order.orderNumber}</td>
+                      <td>{d.order.branch?.name ?? "—"}</td>
+                      <td>{d.driver?.user?.name ?? "—"}</td>
+                      <td>
+                        <DeliveryStatusBadge status={d.status} />
+                      </td>
+                      <td>{formatMoney(d.amountToCollect)}</td>
+                      <td>
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="outline" onClick={() => setInvoiceDeliveryId(d.id)}>
+                            🧾 فاتورة
+                          </Button>
+                          {canReassign && (
+                            <Button size="sm" variant="outline" onClick={() => openReassignModal(d)}>
+                              {d.status === "FAILED" ? "إعادة تعيين سائق (إعادة محاولة)" : "إعادة تعيين سائق"}
+                            </Button>
+                          )}
+                          {canAdvance && (
+                            <Button size="sm" variant="secondary" onClick={() => openAdvanceModal(d)}>
+                              تقديم الحالة
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+      <DeliveryInvoiceModal deliveryId={invoiceDeliveryId} onClose={() => setInvoiceDeliveryId(null)} />
+
+      {/* Assign driver to a READY_FOR_DELIVERY order with no delivery yet. */}
+      <Modal open={assignOpen} onClose={() => setAssignOpen(false)} title="تعيين سائق لطلب">
+        <div className="space-y-4">
+          {!readyOrders || !drivers ? (
+            <FullPageSpinner label="جارِ تحميل البيانات..." />
+          ) : (
+            <>
+              <Field label="الطلب الجاهز للتوصيل" hint={assignableOrders.length === 0 ? "لا توجد طلبات جاهزة للتوصيل بدون توصيل حالياً" : undefined}>
+                <Select value={assignOrderId} onChange={(e) => setAssignOrderId(e.target.value)} disabled={assignableOrders.length === 0}>
+                  <option value="">اختر طلباً</option>
+                  {assignableOrders.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.orderNumber} — {o.customer?.name || o.customer?.phone || ""}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="السائق">
+                <Select value={assignDriverId} onChange={(e) => setAssignDriverId(e.target.value)}>
+                  <option value="">اختر سائقاً</option>
+                  {drivers.map((drv) => (
+                    <option key={drv.id} value={drv.id}>
+                      {drv.user.name} — {driverAvailabilityLabel(drv.availability)}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <div className="flex justify-end gap-2">
+                <Button variant="secondary" onClick={() => setAssignOpen(false)} disabled={actionLoading}>
+                  إلغاء
+                </Button>
+                <Button onClick={handleAssign} loading={actionLoading} disabled={actionLoading || !assignOrderId || !assignDriverId}>
+                  تعيين
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* Reassign driver (also the FAILED-delivery retry path). */}
+      <Modal open={!!reassignTarget} onClose={() => setReassignTarget(null)} title="إعادة تعيين سائق">
+        <div className="space-y-4">
+          {!drivers ? (
+            <FullPageSpinner label="جارِ تحميل السائقين..." />
+          ) : (
+            <>
+              <Field label="السائق الجديد">
+                <Select value={reassignDriverId} onChange={(e) => setReassignDriverId(e.target.value)}>
+                  <option value="">اختر سائقاً</option>
+                  {drivers.map((drv) => (
+                    <option key={drv.id} value={drv.id}>
+                      {drv.user.name} — {driverAvailabilityLabel(drv.availability)}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <div className="flex justify-end gap-2">
+                <Button variant="secondary" onClick={() => setReassignTarget(null)} disabled={actionLoading}>
+                  إلغاء
+                </Button>
+                <Button onClick={handleReassign} loading={actionLoading} disabled={actionLoading || !reassignDriverId}>
+                  تأكيد
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* Advance a delivery's own status. */}
+      <Modal open={!!advanceTarget} onClose={() => setAdvanceTarget(null)} title="تقديم حالة التوصيل">
+        <div className="space-y-4">
+          <Field label="الحالة التالية">
+            <Select value={advanceStatus} onChange={(e) => setAdvanceStatus(e.target.value)}>
+              {(advanceTarget ? DELIVERY_ADVANCE_TRANSITIONS[advanceTarget.status] ?? [] : []).map((s) => (
+                <option key={s} value={s}>
+                  {deliveryStatusLabel(s)}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          {advanceStatus === "FAILED" && (
+            <Field label="سبب الفشل (اختياري)">
+              <Textarea value={advanceReason} onChange={(e) => setAdvanceReason(e.target.value)} rows={3} />
+            </Field>
+          )}
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setAdvanceTarget(null)} disabled={actionLoading}>
+              إلغاء
+            </Button>
+            <Button onClick={handleAdvance} loading={actionLoading} disabled={actionLoading || !advanceStatus}>
+              تأكيد
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}

@@ -1,0 +1,687 @@
+// PHARMACY AI COMMAND CENTER — Phase 1 schema
+// Covers: Database + Authentication + Roles (Phase 1), plus the table shapes Phases 2-9 build on.
+// Independent of the existing claude.ai/Cloudflare pharmacy dashboard — no shared database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================== AUTH / RBAC (Phase 1) =====================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // SUPER_ADMIN, ADMIN, PHARMACY_MANAGER, PHARMACIST, PHARMACY_EMPLOYEE, DELIVERY_DRIVER, CUSTOMER_SERVICE, ACCOUNTING
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. "inventory.read", "orders.write", "carelink.admin"
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  phone         String?   @unique
+  passwordHash  String
+  name          String
+  roleId        String
+  branchId      String? // null for roles not scoped to one branch (e.g. SUPER_ADMIN, ACCOUNTING)
+  active        Boolean   @default(true)
+  twoFactorSecret String? // set once 2FA is enabled for this user (required for ADMIN/SUPER_ADMIN — see plan doc)
+  twoFactorEnabled Boolean @default(false)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  role     Role      @relation(fields: [roleId], references: [id])
+  branch   Branch?   @relation(fields: [branchId], references: [id])
+  employee Employee?
+  driver   Driver?
+  auditLogs AuditLog[]
+
+  @@index([branchId])
+  @@map("users")
+}
+
+// ===================== BRANCHES / EMPLOYEES (Phase 2) =====================
+
+model Branch {
+  id            String   @id @default(cuid())
+  name          String
+  address       String?
+  phone         String?
+  whatsappNumber String? @unique
+  workingHours  String? // free text for Phase 1; structured hours can follow later
+  status        BranchStatus @default(ACTIVE)
+  // New: الجواد كير (بعلبك) والعاصي (الهرمل) — المستخدم حدّد هاتين الصيدليتين بالاسم كاستثناء:
+  // طلب عميل من "البقاع" (بالمعنى الشائع الذي يشمل بعلبك-الهرمل، وهذا مؤكَّد من عنواني هاتين
+  // الصيدليتين الحقيقيين في المستند المرفوع، لا افتراضاً) يُقصر البحث عليهما فقط دون سواهما —
+  // انظر src/lib/region.ts، ومقاطع assign_pharmacy/search_inventory في src/lib/aiTools.ts.
+  // حقل عام (لا يفترض اسم فرع) بحيث لو أضيف فرع آخر لهذه المنطقة لاحقاً يكفي تفعيل هذا الحقل له.
+  isBekaaExclusive Boolean @default(false)
+  // Real numbers the user sent: "ديلفري الجواد كير" 81501394 و"ديلفري العاصي" 76324551 — each
+  // branch's OWN delivery line, not a shared one. This is deliberately NOT modeled through
+  // `Driver`/`Delivery` (Phase 6) — those model an in-app driver pool with tracked
+  // availability/status, and there's no indication these two numbers are that; they read the
+  // same as CareLink's own number (src/lib/region.ts's note): a phone/WhatsApp contact a human
+  // calls to arrange delivery, not a resource this app dispatches or tracks. null for every
+  // other branch (they use the normal Driver pool via create_delivery/createDelivery as today).
+  // See the create_delivery handler in src/lib/aiTools.ts for how this changes its behavior.
+  // Also now set on the 4 Beirut branches (الرسول، يحيى، فارماكير، طالب) — same shape, a
+  // SHARED number this time: the user's real Beirut-wide delivery company ("شركة المختار"),
+  // not a per-branch line. The field doesn't need to be unique per branch to express that.
+  specialDeliveryContactWhatsapp String?
+  // Optional human-readable name for the number above (e.g. "شركة المختار" for Beirut) — null
+  // where the user only gave a number with no company/person name (الجواد كير والعاصي today).
+  // Display-only; create_delivery's handler includes it in its message when present.
+  specialDeliveryContactLabel String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users        User[]
+  employees    Employee[]
+  inventory    Inventory[]
+  orders       Order[]
+  carelinkJobs CarelinkJob[]
+  // See CarelinkInquiry's own comment — the real, now-confirmed CareLink order-broker flow's
+  // "ask this branch to reserve + quote a price over WhatsApp" step.
+  carelinkInquiries CarelinkInquiry[]
+
+  @@map("branches")
+}
+
+enum BranchStatus {
+  ACTIVE
+  DISABLED
+}
+
+model Employee {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  branchId  String
+  title     String?
+  shift     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@index([branchId])
+  @@map("employees")
+}
+
+model Driver {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  vehicle      String?
+  availability DriverAvailability @default(OFFLINE)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries Delivery[]
+
+  @@map("drivers")
+}
+
+enum DriverAvailability {
+  AVAILABLE
+  BUSY
+  OFFLINE
+}
+
+// ===================== CUSTOMERS (Phase 3-4) =====================
+
+model Customer {
+  id            String   @id @default(cuid())
+  name          String?
+  phone         String   @unique // WhatsApp identity — the primary lookup key
+  address       String?
+  locationLat   Float?
+  locationLng   Float?
+  consentMarketing Boolean @default(false)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orders        Order[]
+  conversations WhatsappConversation[]
+
+  @@map("customers")
+}
+
+// ===================== PRODUCTS / INVENTORY (Phase 2) =====================
+
+enum ProductType {
+  COSMETIC
+  OTC
+  PRESCRIPTION
+  CONTROLLED
+}
+
+model Product {
+  id               String      @id @default(cuid())
+  name             String
+  brand            String?
+  barcode          String?     @unique
+  genericName      String?
+  activeIngredient String?
+  category         String?
+  type             ProductType @default(OTC)
+  imageUrl         String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  inventory   Inventory[]
+  orderItems  OrderItem[]
+  carelinkInquiries CarelinkInquiry[]
+
+  @@index([name])
+  @@index([barcode])
+  @@map("products")
+}
+
+model Inventory {
+  id                String   @id @default(cuid())
+  productId         String
+  branchId          String
+  qtyOnHand         Int      @default(0)
+  qtyReserved       Int      @default(0)
+  lowStockThreshold Int      @default(10) // Phase 2: drives the low-stock alert queries (plan doc §11/§14)
+  price             Decimal  @db.Decimal(10, 2)
+  expiryDate        DateTime?
+  updatedAt         DateTime @updatedAt
+
+  product      Product  @relation(fields: [productId], references: [id])
+  branch       Branch   @relation(fields: [branchId], references: [id])
+  reservations Reservation[]
+  transactions InventoryTransaction[]
+
+  @@unique([productId, branchId])
+  @@index([branchId])
+  // Available quantity = qtyOnHand - qtyReserved; enforced in application logic at the
+  // reserve_product() tool boundary (Phase 3), with a DB CHECK constraint added in the first
+  // real migration (Postgres CHECK referencing two columns is declared via a migration, not
+  // the Prisma DSL) — see README "What's deliberately NOT done yet".
+  @@map("inventory")
+}
+
+model InventoryTransaction {
+  id          String   @id @default(cuid())
+  inventoryId String
+  type        InventoryTxType
+  qty         Int
+  refOrderId  String?
+  userId      String? // null when the system made the change (e.g. an automated reservation expiry)
+  note        String?
+  createdAt   DateTime @default(now())
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id])
+
+  @@index([inventoryId])
+  @@map("inventory_transactions")
+}
+
+enum InventoryTxType {
+  STOCK_IN
+  STOCK_OUT
+  ADJUSTMENT
+  RESERVATION_HOLD
+  RESERVATION_RELEASE
+}
+
+// ===================== ORDERS / RESERVATIONS (Phase 3) =====================
+
+enum OrderStatus {
+  PENDING_CONFIRMATION
+  CONFIRMED
+  PREPARING
+  READY_FOR_DELIVERY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  CARD_ON_DELIVERY
+  OTHER
+}
+
+// Added this session to encode ONE confirmed fact about Phase 7 (CareLink), without assuming
+// anything about the still-unresolved question of HOW a CareLink order technically reaches a
+// branch (asked the user twice — "رقم/موقع تقني؟" — both times "لا تفضيل"/no preference).
+// The user's own words, verbatim: "Carelink هي عبارة عن واسطة لتلقي الطلبيات من خلال رقمها
+// وموقعها والانستغرام وتحويله الى الصيدليات للبحث عن المنتج ثم تحويله الى الديلفري" (CareLink
+// is a broker: receives orders via its own phone/site/Instagram, forwards to pharmacies to
+// check availability, then forwards to delivery) — and then, directly confirmed: "نعم —
+// Carelink دائماً يوصّل طلباتها بنفسه (الأرجح)" (yes, CareLink always delivers its own orders
+// itself). That second sentence is the only piece this enum encodes: it is a delivery-dispatch
+// flag, not a claim about intake mechanics. DIRECT is every order the pharmacy/AI/CS pipeline
+// creates normally (default). CARELINK marks an order that came in through CareLink's broker
+// relationship — see src/lib/aiTools.ts's create_delivery, which refuses internal driver-pool/
+// branch-contact dispatch for CARELINK orders the same way it already refuses it for
+// specialDeliveryContactWhatsapp branches, and for the same reason: someone else already has it.
+// Nothing in this codebase sets source to CARELINK automatically yet — see the comment on
+// Order.source below and src/lib/orders.ts's CreateOrderInput for why that's deliberate.
+enum OrderSource {
+  DIRECT
+  CARELINK
+}
+
+// Backs the atomic ORD-YYYY-NNNNNN generator in src/lib/orderNumber.ts: one row per year,
+// incremented inside the same transaction that creates the order, so two concurrent orders
+// can never collide on a number (Postgres serializes the UPDATE on this row).
+model OrderSequence {
+  year       Int @id
+  lastNumber Int @default(0)
+
+  @@map("order_sequences")
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique // e.g. ORD-2026-000125, generated at creation — see lib
+  customerId    String
+  branchId      String
+  status        OrderStatus @default(PENDING_CONFIRMATION)
+  paymentMethod PaymentMethod @default(CASH_ON_DELIVERY)
+  // Defaults to DIRECT (every order created through today's normal flow). Settable to CARELINK
+  // only by whoever/whatever eventually logs a CareLink-forwarded order — that intake mechanism
+  // is NOT built yet (still open: see the OrderSource enum comment above). This field exists so
+  // create_delivery can enforce "CareLink delivers its own orders" the moment such an order
+  // exists, without blocking on that unresolved question first.
+  source        OrderSource @default(DIRECT)
+  deliveryAddress String?
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  customer Customer    @relation(fields: [customerId], references: [id])
+  branch   Branch      @relation(fields: [branchId], references: [id])
+  items    OrderItem[]
+  delivery Delivery?
+
+  @@index([branchId])
+  @@index([customerId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  qty       Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order        Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product       @relation(fields: [productId], references: [id])
+  reservation  Reservation?
+
+  @@map("order_items")
+}
+
+enum ReservationStatus {
+  HELD
+  CONSUMED // order confirmed and stock actually deducted
+  RELEASED // cancelled / expired — stock returned
+}
+
+model Reservation {
+  id          String            @id @default(cuid())
+  orderItemId String            @unique
+  inventoryId String
+  status      ReservationStatus @default(HELD)
+  expiresAt   DateTime // unconfirmed holds auto-release after a short TTL (e.g. 15 min)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  inventory Inventory @relation(fields: [inventoryId], references: [id])
+
+  @@index([inventoryId, status])
+  @@map("reservations")
+}
+
+// ===================== DELIVERY (Phase 6) =====================
+
+enum DeliveryStatus {
+  ASSIGNED
+  ACCEPTED
+  PICKED_UP
+  ON_THE_WAY
+  DELIVERED
+  FAILED
+}
+
+model Delivery {
+  id               String         @id @default(cuid())
+  orderId          String         @unique
+  driverId         String?
+  status           DeliveryStatus @default(ASSIGNED)
+  amountToCollect  Decimal        @db.Decimal(10, 2)
+  notes            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  order  Order   @relation(fields: [orderId], references: [id])
+  driver Driver? @relation(fields: [driverId], references: [id])
+
+  @@index([driverId])
+  @@map("deliveries")
+}
+
+// ===================== WHATSAPP (Phase 4-5) =====================
+
+enum AssignedAgent {
+  AI
+  HUMAN
+}
+
+enum ConversationStatus {
+  OPEN
+  TRANSFERRED_TO_PHARMACIST
+  CLOSED
+}
+
+// Added this session with the real, confirmed CareLink order-broker flow (see CarelinkInquiry's
+// comment): CareLink has its OWN WhatsApp Business number (customers call/message it, not a
+// branch's number) — so a conversation on that number is NOT "this branch's customer," it's
+// CareLink's own customer, and the AI answering it plays a different role (pick a branch via
+// assign_pharmacy, ask IT to reserve+quote, then notify CareLink's own delivery — never the
+// in-app driver pool). `channel` is how the webhook (src/app/api/whatsapp/webhook/route.ts) and
+// the orchestrator (src/lib/aiOrchestrator.ts — system prompt + which Tools are even offered)
+// tell the two apart, and how conversations.ts's sendReply() knows which WhatsApp Business
+// phone number id to reply FROM (WHATSAPP_CARELINK_PHONE_NUMBER_ID vs the default one).
+enum ConversationChannel {
+  DIRECT
+  CARELINK
+}
+
+model WhatsappConversation {
+  id             String              @id @default(cuid())
+  customerId     String
+  assignedAgent  AssignedAgent       @default(AI)
+  assignedBranchId String?
+  status         ConversationStatus  @default(OPEN)
+  channel        ConversationChannel @default(DIRECT)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  customer Customer           @relation(fields: [customerId], references: [id])
+  messages WhatsappMessage[]
+  carelinkInquiries CarelinkInquiry[]
+
+  @@index([customerId])
+  @@map("whatsapp_conversations")
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  TEMPLATE
+  SYSTEM
+}
+
+model WhatsappMessage {
+  id             String           @id @default(cuid())
+  conversationId String
+  direction      MessageDirection
+  type           MessageType
+  content        String // text body, or a URL/reference for media
+  waMessageId    String?          @unique // Meta's own message id, for delivery/read receipts
+  createdAt      DateTime         @default(now())
+
+  conversation WhatsappConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("whatsapp_messages")
+}
+
+// ===================== DOCUMENTS (Phase 8) =====================
+
+model Document {
+  id         String   @id @default(cuid())
+  ownerType  String // e.g. "order", "customer", "carelink_job", "general"
+  ownerId    String?
+  fileUrl    String
+  fileName   String
+  mimeType   String?
+  tags       String[] @default([])
+  metadata   Json?
+  uploadedBy String?
+  createdAt  DateTime @default(now())
+
+  @@index([ownerType, ownerId])
+  @@map("documents")
+}
+
+// ===================== CARELINK (Phase 7) =====================
+
+enum CarelinkJobStatus {
+  PENDING
+  RUNNING
+  DONE
+  FAILED
+}
+
+// NOTE (flagged, now mostly resolved — kept as-is anyway, see below): `type`'s examples below
+// (classify_files/find_duplicates/create_folder) were a placeholder guess written before any
+// real CareLink data existed, assuming a file-management-style platform. That's now disproven.
+// What's actually confirmed, in the user's own words: "Carelink هي عبارة عن واسطة لتلقي الطلبيات
+// من خلال رقمها وموقعها والانستغرام وتحويله الى الصيدليات للبحث عن المنتج ثم تحويله الى
+// الديلفري" — CareLink is an order-broker: it takes customer orders via its own phone/website/
+// Instagram, relays them to a pharmacy to fulfill, then handles delivery itself (also confirmed:
+// "Carelink دائماً يوصّل طلباتها بنفسه" — see the new OrderSource enum below and create_delivery
+// in src/lib/aiTools.ts, which now enforces exactly that one fact).
+// Given that, this CarelinkJob model is probably the wrong shape for what CareLink really is:
+// what a pharmacy receives from CareLink is an ORDER (product + customer + "check stock and
+// fulfill, we'll deliver"), not a queueable background "job" like classify_files ever was.
+// UPDATE (this session, resolved): the once-open "how does an order technically reach a
+// branch" question now has a real, detailed answer from the user — see CarelinkInquiry below,
+// which is the actual new model built for it. CarelinkJob itself is STILL kept exactly as-is
+// (nothing creates it for real, nothing reads it) because the real flow turned out to need a
+// different shape entirely (CarelinkInquiry + Order.source, not a generic job queue) rather
+// than confirming this model's own design — removing it now that it's confirmed unused would
+// be a reasonable follow-up, but is left for the user to decide explicitly rather than done
+// unilaterally here (its own created-for-real-data test: nothing in this codebase instantiates
+// a CarelinkJob anywhere, by design — see create_carelink_job in src/lib/aiTools.ts).
+model CarelinkJob {
+  id            String            @id @default(cuid())
+  branchId      String?
+  type          String // placeholder examples only — see the note above, not confirmed
+  status        CarelinkJobStatus @default(PENDING)
+  payload       Json?
+  resultSummary String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  @@map("carelink_jobs")
+}
+
+// The real CareLink order-broker flow, in the user's own words (verbatim): "استقبال carelink
+// للطلبات تتم من خلال اتصال الزبون على الرقم الخاص لـ carelink ووكيل الذكاء الاصطناعي يقوم
+// بالجواب على الرسالة بحيث يمكنه الدخول الى مخزون الصيدليات ويبحث عن المنتج ومن ثم يرسل رسالة
+// للصيدلية بحجز المنتج ولدى رد الصيدلية وتزويده بالسعر يعود وكيل الذكاء الاصطناعي ويعلم الزبون
+// بالسعر وعند الموافقة يتصل الذكاء الاصطناعي برقم الديلفري ويعلمه بالعنوان واي صيدلية الطلب" —
+// a customer messages CareLink's own WhatsApp number; the AI searches inventory, picks a
+// branch (assign_pharmacy), asks THAT branch over WhatsApp to reserve the item and quote a
+// price (src/lib/aiTools.ts's request_branch_reservation), waits for the branch's WhatsApp
+// reply, relays the price to the customer, and on approval creates the order (source=CARELINK)
+// and notifies CareLink's own delivery line (notify_carelink_delivery) — confirmed by the user
+// to be an automatic WhatsApp/text message, NOT a real voice call, same for the branch's own
+// reply.
+// This model tracks exactly ONE outstanding "asked a branch to reserve+quote" step. It is
+// deliberately NOT a queueable background job (that's CarelinkJob above, and this is why that
+// model turned out to be the wrong shape) — it's a single pending question with one expected
+// WhatsApp reply. `referenceCode` is included in the outbound WhatsApp message so the branch's
+// reply CAN be matched exactly if they quote it back; src/lib/carelink.ts's
+// handleCarelinkBranchReply() falls back to "the latest PENDING inquiry for this branch" when
+// the reply doesn't include it — a real, documented best-effort limitation (asked once;
+// unresolved in this session), not a guess at a feature nobody asked for.
+// `quotedPrice` is informational — it's what the branch said, best-effort-parsed from free
+// WhatsApp text (see parsePriceFromText in src/lib/carelink.ts) and relayed to the customer. It
+// is NOT what create_order ultimately charges — createOrder() (src/lib/orders.ts) still prices
+// every OrderItem from the authoritative Inventory.price, same as every other order; nobody has
+// asked for a per-branch price-override mechanism, and silently trusting a regex-parsed number
+// from free text as the real charged amount would be exactly the kind of invented business rule
+// this project avoids. A real mismatch between quotedPrice and Inventory.price is a data-
+// accuracy problem to surface (see request_branch_reservation's own comment), not something to
+// paper over by charging whatever the branch happened to type.
+enum CarelinkInquiryStatus {
+  PENDING // sent to the branch, no usable reply yet
+  ANSWERED // branch replied with a price we could parse
+  NEEDS_REVIEW // branch replied, but the reply's price couldn't be parsed automatically — a
+  // human should read `rawReply`; the AI is instructed (aiOrchestrator.ts's CareLink system
+  // prompt addendum) to tell the customer it needs a bit more time rather than invent a price.
+  CANCELLED
+}
+
+model CarelinkInquiry {
+  id             String                @id @default(cuid())
+  conversationId String // the CARELINK-channel WhatsappConversation waiting on this reply
+  branchId       String
+  productId      String
+  qty            Int
+  referenceCode  String                @unique // e.g. "CLK-7F3A2K" — quoted in the outbound message
+  status         CarelinkInquiryStatus @default(PENDING)
+  quotedPrice    Decimal?              @db.Decimal(10, 2) // informational only — see note above
+  rawReply       String? // the branch's literal WhatsApp reply text, kept for audit + human review
+  createdAt      DateTime              @default(now())
+  answeredAt     DateTime?
+
+  conversation WhatsappConversation @relation(fields: [conversationId], references: [id])
+  branch       Branch               @relation(fields: [branchId], references: [id])
+  product      Product              @relation(fields: [productId], references: [id])
+
+  @@index([branchId, status])
+  @@index([conversationId])
+  @@map("carelink_inquiries")
+}
+
+// ===================== PARTNER SUPPLIERS (شركات شريكة، مثل لطافة) =====================
+
+// A partner company that is NOT a pharmacy branch and keeps NO stock in this system. Real flow, in
+// the user's own words (verbatim): "شركة لطافة ... لديها مخزون كبير من الروائح وقد تم الاتفاق معهم
+// على ان نتواصل معهم ونرسل لهم الديلفري شركة المختار ونتحاسب لاحقا ... في حال طلب الزبون اي سلعة
+// غير موجود في الصيدليات نتصل بالشركة ونحجز ونرسل الديلفري". So: no Inventory rows, no Order rows —
+// when no pharmacy has the item, the AI asks the supplier over WhatsApp (SupplierInquiry), relays
+// the answer to the customer, and after the customer agrees notifies the delivery company
+// (deliveryContactWhatsapp, e.g. شركة المختار). Payment is settled with the supplier later
+// (paymentTerms is display-only text). Status/enums are plain strings on purpose: the tables are
+// created by prisma/real-data/setupSuppliers.ts (idempotent raw SQL), so no enum migration is needed.
+model Supplier {
+  id                      String   @id @default(cuid())
+  name                    String
+  whatsappNumber          String   @unique // E.164, e.g. +9613854133
+  specialty               String? // what they sell, e.g. "عطور وروائح" — the AI reads this to know WHEN to ask them
+  deliveryContactWhatsapp String?
+  deliveryContactLabel    String?
+  paymentTerms            String? // e.g. "الحساب لاحقاً"
+  notes                   String?
+  status                  String   @default("ACTIVE") // ACTIVE | DISABLED
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  inquiries SupplierInquiry[]
+
+  @@map("suppliers")
+}
+
+model SupplierInquiry {
+  id                 String    @id @default(cuid())
+  supplierId         String
+  conversationId     String // the WhatsappConversation waiting on this reply (plain id, no relation)
+  referenceCode      String    @unique // e.g. "SUP-7F3A2K" — quoted in the outbound message
+  productText        String // free text: supplier items are not in the product catalog
+  qty                Int
+  status             String    @default("PENDING") // PENDING | ANSWERED | NEEDS_REVIEW | CONFIRMED | CANCELLED
+  quotedPrice        Decimal?  @db.Decimal(10, 2) // informational only
+  rawReply           String? // the supplier's literal WhatsApp reply, kept for audit + human review
+  deliveryAddress    String?
+  createdAt          DateTime  @default(now())
+  answeredAt         DateTime?
+  deliveryNotifiedAt DateTime?
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([supplierId, status])
+  @@index([conversationId])
+  @@map("supplier_inquiries")
+}
+
+// ===================== NOTIFICATIONS =====================
+
+enum NotificationChannel {
+  WHATSAPP
+  EMAIL
+  IN_APP
+}
+
+model Notification {
+  id            String              @id @default(cuid())
+  recipientType String // "customer" | "employee" | "driver"
+  recipientId   String
+  channel       NotificationChannel
+  payload       Json
+  sentAt        DateTime?
+  createdAt     DateTime            @default(now())
+
+  @@map("notifications")
+}
+
+// ===================== AUDIT LOG (cross-cutting) =====================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String // e.g. "order.cancel", "inventory.adjust", "carelink.delete_file"
+  entity    String // e.g. "Order:ord_123"
+  oldValue  Json?
+  newValue  Json?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([entity])
+  @@index([userId])
+  @@map("audit_logs")
+}

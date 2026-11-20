@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   مظهر "مرِح وودود" — نفس هوية وحدة الصيدليات.
+   طبقة شكلية فقط: ألوان وخطوط وأشكال. لا تغيّر أي منطق.
+   ============================================================ */
+:root {
+  color-scheme: light;
+  --font-tajawal: "Tajawal", "Tahoma", "Arial", sans-serif;
+  --ink: #1d2b4f;
+  --line: #b9c7e8;
+  --surface-2: #eef4ff;
+  --sun: #ffd34d;
+  --accent: #ee4a34;
+  --blob1: rgba(255, 184, 28, 0.3);
+  --blob2: rgba(46, 163, 255, 0.26);
+  --blob3: rgba(255, 126, 176, 0.26);
+  --blob4: rgba(25, 185, 138, 0.24);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 6%, var(--blob1) 0 150px, transparent 151px),
+    radial-gradient(circle at 93% 14%, var(--blob2) 0 190px, transparent 191px),
+    radial-gradient(circle at 84% 94%, var(--blob3) 0 210px, transparent 211px),
+    radial-gradient(circle at 5% 88%, var(--blob4) 0 170px, transparent 171px),
+    radial-gradient(rgba(29, 43, 79, 0.07) 1.6px, transparent 1.8px) 0 0 / 24px 24px,
+    linear-gradient(160deg, #e6f3ff, #f1f7ff 50%, #fff1f4) fixed;
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-baloo), var(--font-tajawal), sans-serif;
+  letter-spacing: 0;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #b9c7e8 transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #b9c7e8;
+  border-radius: 9999px;
+}
+
+/* حقول الإدخال: حدود أوضح وتركيز أزرق */
+select,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="month"],
+input[type="password"],
+input[type="email"],
+input[type="search"],
+input[type="tel"],
+textarea {
+  border-width: 2px;
+}
+
+/* جدول موحّد عبر الموقع (Table) */
+.pacc-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+.pacc-table thead th {
+  text-align: right;
+  font-weight: 700;
+  color: #46557c;
+  background-color: var(--surface-2);
+  padding: 0.7rem 0.9rem;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--line);
+}
+.pacc-table thead th:first-child {
+  border-top-right-radius: 14px;
+}
+.pacc-table thead th:last-child {
+  border-top-left-radius: 14px;
+}
+.pacc-table tbody td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px dashed var(--line);
+  vertical-align: middle;
+}
+.pacc-table tbody tr:hover {
+  background-color: rgba(255, 211, 77, 0.22);
+}
+.pacc-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+@keyframes pacc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.pacc-spin {
+  animation: pacc-spin 0.7s linear infinite;
+}
+
+/* حركة خفيفة لعناصر القائمة */
+.pop-nav {
+  transition: transform 0.15s ease, background 0.15s;
+}
+.pop-nav:hover {
+  transform: translateX(-4px) rotate(-0.6deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop-nav,
+  .pop-nav:hover {
+    transition: none;
+    transform: none;
+  }
+}
