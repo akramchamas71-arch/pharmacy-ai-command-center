@@ -7,6 +7,7 @@ import { handleFailedDeliveryNotice, FAILED_STATUS_CODES } from "@/lib/deliveryF
 import { handleFailedInquiryMessage } from "@/lib/inquiryFallback";
 import { knownDeliveryDigits } from "@/lib/deliveryContacts";
 import { logAudit } from "@/lib/audit";
+import { handleWhatsAppLoginMessage } from "@/lib/customerAuth";
 import { handleSupplierReply } from "@/lib/suppliers";
 import { runAiTurn } from "@/lib/aiOrchestrator";
 import { AnthropicConfigError } from "@/lib/anthropic";
@@ -269,6 +270,9 @@ async function processValues(values: WaValue[]) {
 
         const fromPhone = `+${message.from as string}`;
         const contact = value.contacts?.find((c) => c.wa_id === (message.from as string));
+
+        // CareLink app login: the customer sent the ready-made "CL-XXXXXX" message from the app.
+        if (isCareLinkChannel && (await handleWhatsAppLoginMessage(fromPhone, extractContent(message)))) continue;
 
         const customer = await findOrCreateCustomerByPhone({
           phone: fromPhone,

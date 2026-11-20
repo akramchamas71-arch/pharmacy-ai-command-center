@@ -128,3 +128,59 @@ export function setCustomerCookie(res: NextResponse, token: string) {
 export function unauthorized() {
   return NextResponse.json({ error: "الرجاء تسجيل الدخول" }, { status: 401 });
 }
+
+// ---------------------------------------------------------------------------------------------
+// Login WITHOUT an authentication template: the customer sends a ready-made WhatsApp message
+// ("CL-XXXXXX") from their phone to the CareLink number. That proves they own the number, costs
+// nothing (customer-initiated) and also opens the 24h window so replies reach them on WhatsApp too.
+// The browser that started the login holds the token in an httpOnly cookie and polls for it.
+// ---------------------------------------------------------------------------------------------
+export const LOGIN_TOKEN_COOKIE = "carelink_login";
+const TOKEN_TTL_MS = 15 * 60 * 1000;
+
+export async function startWhatsAppLogin(): Promise<{ token: string; waLink: string | null }> {
+  const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let token = "CL-";
+  for (let i = 0; i < 6; i++) token += alphabet[crypto.randomInt(0, alphabet.length)];
+  await logAudit({ userId: null, action: "customer.login.start", entity: `LoginToken:${token}`, newValue: { exp: Date.now() + TOKEN_TTL_MS } });
+  const number = (process.env.CARELINK_CONTACT_WHATSAPP ?? "").replace(/\D/g, "");
+  const text = `رمز الدخول إلى تطبيق Carelink: ${token}`;
+  return { token, waLink: number ? `https://wa.me/${number}?text=${encodeURIComponent(text)}` : null };
+}
+
+/** Called by the WhatsApp webhook for every message on the CareLink number. true = it was a login message. */
+export async function handleWhatsAppLoginMessage(fromPhone: string, content: string): Promise<boolean> {
+  const m = content.toUpperCase().match(/CL-[A-HJ-NP-Z2-9]{6}/);
+  if (!m) return false;
+  const entity = `LoginToken:${m[0]}`;
+  const start = await prisma.auditLog.findFirst({ where: { action: "customer.login.start", entity }, orderBy: { createdAt: "desc" } });
+  const exp = (start?.newValue as { exp?: number } | null)?.exp ?? 0;
+  if (!start || exp < Date.now()) return false; // unknown/expired code: treat as a normal message
+  const done = await prisma.auditLog.findFirst({ where: { action: "customer.login.confirmed", entity }, select: { id: true } });
+  if (!done) {
+    await logAudit({ userId: null, action: "customer.login.confirmed", entity, newValue: { phone: fromPhone } });
+  }
+  try {
+    const { sendTextMessage } = await import("@/lib/whatsapp");
+    await sendTextMessage(fromPhone.replace(/^\+/, ""), "✅ تم تسجيل دخولك إلى تطبيق Carelink. ارجع إلى التطبيق لمتابعة طلبك.", {
+      fromPhoneNumberId: process.env.WHATSAPP_CARELINK_PHONE_NUMBER_ID,
+    });
+  } catch (e) {
+    console.warn("[shop] login confirmation reply failed", e);
+  }
+  return true;
+}
+
+/** Returns the customer id once the WhatsApp message for this token has arrived, else null. */
+export async function pollWhatsAppLogin(token: string): Promise<string | null> {
+  const confirmed = await prisma.auditLog.findFirst({
+    where: { action: "customer.login.confirmed", entity: `LoginToken:${token}`, createdAt: { gt: new Date(Date.now() - TOKEN_TTL_MS) } },
+  });
+  const phone = (confirmed?.newValue as { phone?: string } | null)?.phone;
+  if (!phone) return null;
+  const key = phoneKey(phone);
+  const existing = await prisma.customer.findFirst({ where: { phone: { endsWith: key } }, orderBy: { createdAt: "asc" } });
+  const customer = existing ?? (await prisma.customer.create({ data: { phone } }));
+  await logAudit({ userId: null, action: "customer.login", entity: `Customer:${customer.id}`, newValue: { via: "whatsapp-message" } });
+  return customer.id;
+}
