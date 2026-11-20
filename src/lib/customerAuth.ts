@@ -202,6 +202,10 @@ export async function pollWhatsAppLogin(token: string): Promise<string | null> {
   const key = phoneKey(phone);
   const existing = await prisma.customer.findFirst({ where: { phone: { endsWith: key } }, orderBy: { createdAt: "asc" } });
   const customer = existing ?? (await prisma.customer.create({ data: { phone } }));
-  await logAudit({ userId: null, action: "customer.login", entity: `Customer:${customer.id}`, newValue: { via: "whatsapp-message" } });
+  const logged = await prisma.auditLog.findFirst({
+    where: { action: "customer.login", entity: `Customer:${customer.id}`, newValue: { path: ["token"], equals: token } },
+    select: { id: true },
+  });
+  if (!logged) await logAudit({ userId: null, action: "customer.login", entity: `Customer:${customer.id}`, newValue: { via: "whatsapp-message", token } });
   return customer.id;
 }

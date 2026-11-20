@@ -16,6 +16,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/inventory", label: "المخزون", icon: "📦", anyOf: [PERMISSION_KEYS.INVENTORY_READ] },
   { href: "/dashboard/orders", label: "الطلبات", icon: "🧾", anyOf: [PERMISSION_KEYS.ORDERS_READ] },
   { href: "/dashboard/whatsapp", label: "محادثات واتساب", icon: "💬", anyOf: [PERMISSION_KEYS.WHATSAPP_SEND] },
+  { href: "/dashboard/reservations", label: "طلبات الحجز", icon: "⏱️", anyOf: [PERMISSION_KEYS.ORDERS_READ] },
   { href: "/dashboard/deliveries", label: "التوصيل", icon: "🚴", anyOf: [PERMISSION_KEYS.DELIVERY_MANAGE] },
   {
     href: "/dashboard/drivers",
