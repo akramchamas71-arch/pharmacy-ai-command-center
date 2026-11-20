@@ -1191,3 +1191,7 @@ afterward should show the AI's reply as an OUTBOUND message if it called
 Full architecture, database rationale, order-lifecycle workflow, roles/security model, and
 the decisions + credentials needed from you before later phases: see the linked doc shared
 in chat (PHARMACY AI COMMAND CENTER).
+
+## النشر (منذ 20 تشرين الثاني 2026)
+
+المصدر الوحيد للكود هو هذا المستودع. كل دفع (push) إلى الفرع `main` يُنشر تلقائياً على Railway (مشروع adequate-nurturing، خدمة app). لا تستعمل `railway up` من نسخ سطح المكتب القديمة.
