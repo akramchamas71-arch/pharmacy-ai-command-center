@@ -37,6 +37,12 @@ export default function ShopHome() {
   const [lq, setLq] = useState("");
   const [shown, setShown] = useState(40);
 
+  // drug browse (before searching)
+  const [letter, setLetter] = useState("");
+  const [drugs, setDrugs] = useState<Product[] | null>(null);
+  const [dnext, setDnext] = useState<number | null>(null);
+  const [dloading, setDloading] = useState(false);
+
   // cosmetics catalog
   const [cats, setCats] = useState<{ key: string; label: string }[]>([]);
   const [cat, setCat] = useState("skin");
@@ -82,6 +88,26 @@ export default function ShopHome() {
       shopFetch<{ items: LItem[] }>("/api/shop/lattafa").then((d) => setCatalog(d.items)).catch(() => setCatalog([]));
     }
   }, [tab, catalog]);
+
+  async function loadDrugs(l: string, offset: number) {
+    setDloading(true);
+    try {
+      const d = await shopFetch<{ products: Product[]; nextOffset: number | null }>(
+        `/api/shop/products?letter=${encodeURIComponent(l)}&offset=${offset}`
+      );
+      setDrugs((prev) => (offset > 0 && prev ? [...prev, ...d.products] : d.products));
+      setDnext(d.nextOffset);
+    } catch {
+      if (offset === 0) setDrugs([]);
+    } finally {
+      setDloading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (tab === "pharmacy" && drugs === null) loadDrugs("", 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   async function loadCosmetics(c: string, term: string, offset: number) {
     setCloading(true);
@@ -207,8 +233,16 @@ export default function ShopHome() {
               لم نجده في الأدوية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-teal-700 underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
             </p>
           )}
+          {q.trim().length < 2 && (
+            <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1" dir="ltr">
+              {["", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((l) => (
+                <button key={l || "all"} className={`${chip(letter === l)} px-2.5`} onClick={() => { setLetter(l); setDrugs(null); loadDrugs(l, 0); }}>{l || "الكل"}</button>
+              ))}
+            </div>
+          )}
+          {q.trim().length < 2 && drugs === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
           <ul className="space-y-2">
-            {results.map((p) => (
+            {(q.trim().length >= 2 ? results : drugs ?? []).map((p) => (
               <li key={p.id} className="flex items-center justify-between gap-3 rounded-2xl border-2 border-slate-200 bg-white p-3">
                 <div className="min-w-0">
                   <p className="truncate font-bold text-slate-900" dir="auto">{p.name}</p>
@@ -226,6 +260,9 @@ export default function ShopHome() {
               </li>
             ))}
           </ul>
+          {q.trim().length < 2 && dnext !== null && drugs && drugs.length > 0 && (
+            <button className={`${btn} w-full bg-white text-slate-700`} disabled={dloading} onClick={() => loadDrugs(letter, dnext)}>{dloading ? "..." : "عرض المزيد"}</button>
+          )}
           <p className="pt-2 text-center text-xs text-slate-500">سعر أدوية الصيدلية تؤكده الصيدلية قبل التوصيل. لا يقدّم التطبيق استشارة طبية.</p>
         </main>
       )}
