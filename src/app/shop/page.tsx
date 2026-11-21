@@ -15,7 +15,7 @@ interface Me { name: string | null; phone: string; address: string | null }
 const RX = (t: string) => t === "PRESCRIPTION";
 const CTRL = (t: string) => t === "CONTROLLED";
 const CART_KEY = "carelink-cart-v2";
-const usd = (n: number) => `${n.toFixed(2)}$`;
+const usd = (n: number) => `${Math.round(n)}$`;
 
 export default function ShopHome() {
   const router = useRouter();
