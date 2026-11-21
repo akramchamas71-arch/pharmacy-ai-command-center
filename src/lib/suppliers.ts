@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { looksUnavailable, looksLikeStockAnswer } from "@/lib/carelink";
 import { NotFoundError } from "@/lib/errors";
 import { logAudit } from "@/lib/audit";
 import { appendInboundMessage } from "@/lib/conversations";
@@ -136,19 +137,26 @@ export async function handleSupplierReply(input: { supplierId: string; content: 
     return;
   }
 
-  const quotedPrice = parseSupplierPrice(content);
+  // App orders from the «لطافة» tab carry the price list's customer price already (quotedPrice set at
+  // creation): the company only has to say available / not available.
+  const knownPrice = inquiry.quotedPrice !== null && inquiry.quotedPrice !== undefined ? Number(inquiry.quotedPrice) : null;
+  const unavailable = looksUnavailable(content);
+  const parsedPrice = parseSupplierPrice(content.replace(/SUP-[A-Z0-9]{4,}/gi, " "));
+  const quotedPrice = unavailable ? null : knownPrice ?? parsedPrice;
+  const confirmed = !unavailable && (knownPrice !== null ? looksLikeStockAnswer(content) : parsedPrice !== null);
   await prisma.supplierInquiry.update({
     where: { id: inquiry.id },
     data: {
-      status: quotedPrice !== null ? "ANSWERED" : "NEEDS_REVIEW",
+      status: confirmed ? "ANSWERED" : "NEEDS_REVIEW",
       quotedPrice: quotedPrice ?? undefined,
       rawReply: content,
       answeredAt: new Date(),
     },
   });
 
-  const note =
-    quotedPrice !== null
+  const note = unavailable
+    ? `[رد الشركة] الصنف غير متوفر لدى الشركة — رمز الطلب ${inquiry.referenceCode}. أبلغ الزبون واقترح بديلاً من القائمة. النص الكامل: "${content}"`
+    : confirmed
       ? `[رد الشركة] السعر المعروض: ${quotedPrice} (الكمية المطلوبة: ${inquiry.qty}) — رمز الطلب ${inquiry.referenceCode}. النص الكامل: "${content}"`
       : `[رد الشركة - يحتاج مراجعة بشرية] لم يُفهم السعر أو التوفر تلقائياً — رمز الطلب ${inquiry.referenceCode}. النص الكامل: "${content}"`;
 

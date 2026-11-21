@@ -792,11 +792,12 @@ const requestSupplierReservationSchema = z.object({
   supplierId: z.string().min(1),
   productText: z.string().min(1),
   qty: z.number().int().positive(),
+  knownPrice: z.number().positive().optional(), // fixed customer price from the company's price list (app orders)
 });
 
 async function request_supplier_reservation(input: unknown, context?: AiToolContext) {
   const aiUser = await requireAiPermission(PERMISSIONS.WHATSAPP_SEND);
-  const { supplierId, productText, qty } = requestSupplierReservationSchema.parse(input);
+  const { supplierId, productText, qty, knownPrice } = requestSupplierReservationSchema.parse(input);
 
   if (!context?.conversationId) {
     throw new BusinessRuleError("هذه الأداة تتطلب سياق محادثة حقيقياً (conversationId) — لا يمكن استخدامها خارج محادثة فعلية.");
@@ -809,14 +810,16 @@ async function request_supplier_reservation(input: unknown, context?: AiToolCont
 
   const referenceCode = `SUP-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
   const inquiry = await prisma.supplierInquiry.create({
-    data: { supplierId, conversationId: context.conversationId, productText, qty, referenceCode },
+    data: { supplierId, conversationId: context.conversationId, productText, qty, referenceCode, ...(knownPrice ? { quotedPrice: knownPrice } : {}) },
   });
 
   let waMessageId: string | undefined;
   try {
     const sent = await sendBusinessMessage(
       supplier.whatsappNumber,
-      `طلب حجز (الرمز: ${referenceCode}): هل يتوفر لديكم "${productText}" بكمية ${qty}؟ الرجاء الرد بالتوفر والسعر، ويفضَّل ذكر الرمز ${referenceCode} في الرد.`,
+      knownPrice
+        ? `طلب حجز (الرمز: ${referenceCode}): "${productText}" بكمية ${qty}، حسب لائحة أسعاركم. الرجاء الرد بـ "متوفر" أو "غير متوفر" فقط، مع ذكر الرمز ${referenceCode}.`
+        : `طلب حجز (الرمز: ${referenceCode}): هل يتوفر لديكم "${productText}" بكمية ${qty}؟ الرجاء الرد بالتوفر والسعر، ويفضَّل ذكر الرمز ${referenceCode} في الرد.`,
       {
         fromPhoneNumberId: process.env.WHATSAPP_CARELINK_PHONE_NUMBER_ID,
         template: { name: WHATSAPP_TEMPLATES.reservation(), params: [referenceCode, productText, String(qty)] },
@@ -1177,6 +1180,7 @@ export const AI_TOOLS: AiToolSpec[] = [
         supplierId: { type: "string" },
         productText: { type: "string", description: "اسم الصنف كما طلبه العميل (مع الماركة/الحجم إن ذُكر)" },
         qty: { type: "integer", minimum: 1 },
+        knownPrice: { type: "number", description: "سعر الزبون الثابت للقطعة بالدولار إن كان معروفاً من لائحة الشركة (طلبات التطبيق من تبويب لطافة). عندها تُسأل الشركة عن التوفر فقط." },
       },
       required: ["supplierId", "productText", "qty"],
     },
