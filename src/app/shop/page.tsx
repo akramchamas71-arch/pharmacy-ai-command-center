@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { btn, input, resizeImage, shopFetch } from "./api";
 
-interface Product { id: string; name: string; brand: string | null; type: string; available: boolean }
+interface Product { id: string; name: string; brand: string | null; type: string; available: boolean; price?: number | null }
+interface CItem { id: string; name: string; type: string; price: number | null; image: string | null; available: boolean }
 interface LItem { id: string; brand: string; brandKey: string; name: string; size: string; price: number; isNew: boolean; image: string | null }
 type CartLine =
   | { kind: "pharmacy"; key: string; product: Product; qty: number }
@@ -20,7 +21,7 @@ const usd = (n: number) => `${Math.round(n)}$`;
 export default function ShopHome() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
-  const [tab, setTab] = useState<"pharmacy" | "lattafa">("pharmacy");
+  const [tab, setTab] = useState<"pharmacy" | "cosmetics" | "lattafa">("pharmacy");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
   const [cart, setCart] = useState<CartLine[]>([]);
 
@@ -35,6 +36,15 @@ export default function ShopHome() {
   const [brand, setBrand] = useState<string>("NEW");
   const [lq, setLq] = useState("");
   const [shown, setShown] = useState(40);
+
+  // cosmetics catalog
+  const [cats, setCats] = useState<{ key: string; label: string }[]>([]);
+  const [cat, setCat] = useState("skin");
+  const [cq, setCq] = useState("");
+  const [citems, setCitems] = useState<CItem[] | null>(null);
+  const [cnext, setCnext] = useState<number | null>(null);
+  const [cloading, setCloading] = useState(false);
+  const ctimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // checkout
   const [area, setArea] = useState("");
@@ -72,6 +82,33 @@ export default function ShopHome() {
       shopFetch<{ items: LItem[] }>("/api/shop/lattafa").then((d) => setCatalog(d.items)).catch(() => setCatalog([]));
     }
   }, [tab, catalog]);
+
+  async function loadCosmetics(c: string, term: string, offset: number) {
+    setCloading(true);
+    try {
+      const d = await shopFetch<{ categories: { key: string; label: string }[]; items: CItem[]; nextOffset: number | null }>(
+        `/api/shop/cosmetics?cat=${encodeURIComponent(c)}&q=${encodeURIComponent(term)}&offset=${offset}`
+      );
+      setCats(d.categories);
+      setCitems((prev) => (offset > 0 && prev ? [...prev, ...d.items] : d.items));
+      setCnext(d.nextOffset);
+    } catch {
+      if (offset === 0) setCitems([]);
+    } finally {
+      setCloading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (tab === "cosmetics" && citems === null) loadCosmetics(cat, "", 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  function onCosmeticSearch(v: string) {
+    setCq(v);
+    if (ctimer.current) clearTimeout(ctimer.current);
+    ctimer.current = setTimeout(() => loadCosmetics(cat, v.trim().length >= 2 ? v.trim() : "", 0), 350);
+  }
 
   function onSearch(v: string) {
     setQ(v);
@@ -151,7 +188,7 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="mt-3 flex gap-1">
-            {([["pharmacy", "💊 من الصيدلية"], ["lattafa", "✨ عطور لطافة"]] as const).map(([k, label]) => (
+            {([["pharmacy", "💊 أدوية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`flex-1 rounded-t-2xl px-3 py-2 text-sm font-extrabold ${tab === k ? "bg-slate-50 text-teal-800" : "bg-teal-800/40 text-white"}`}>
                 {label}
@@ -163,11 +200,11 @@ export default function ShopHome() {
 
       {step === "browse" && tab === "pharmacy" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <input className={input} placeholder="ابحث عن دواء أو منتج..." value={q} onChange={(e) => onSearch(e.target.value)} />
+          <input className={input} placeholder="ابحث عن دواء بالاسم..." value={q} onChange={(e) => onSearch(e.target.value)} />
           {searching && <p className="text-center text-sm text-slate-500">جارٍ البحث...</p>}
           {!searching && q.trim().length >= 2 && results.length === 0 && (
             <p className="rounded-2xl bg-white p-4 text-center text-sm text-slate-600">
-              لم نجده في القائمة. <Link href="/shop/chat" className="font-bold text-teal-700 underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
+              لم نجده في الأدوية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-teal-700 underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
             </p>
           )}
           <ul className="space-y-2">
@@ -190,6 +227,48 @@ export default function ShopHome() {
             ))}
           </ul>
           <p className="pt-2 text-center text-xs text-slate-500">سعر أدوية الصيدلية تؤكده الصيدلية قبل التوصيل. لا يقدّم التطبيق استشارة طبية.</p>
+        </main>
+      )}
+
+      {step === "browse" && tab === "cosmetics" && (
+        <main className="flex-1 space-y-3 p-4 pb-28">
+          <input className={input} placeholder="ابحث: Avene، La Roche، شامبو، SPF..." value={cq} onChange={(e) => onCosmeticSearch(e.target.value)} />
+          {cq.trim().length < 2 && (
+            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+              {cats.map((c) => (
+                <button key={c.key} className={chip(cat === c.key)} onClick={() => { setCat(c.key); setCitems(null); loadCosmetics(c.key, "", 0); }}>{c.label}</button>
+              ))}
+            </div>
+          )}
+          {citems === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
+          {citems && citems.length === 0 && !cloading && <p className="text-center text-sm text-slate-500">لا نتائج.</p>}
+          <div className="grid grid-cols-2 gap-3">
+            {(citems ?? []).map((i) => (
+              <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
+                <div className="flex aspect-square items-center justify-center bg-slate-100">
+                  {i.image
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-cover" />
+                    : <span className="text-4xl opacity-40">🧴</span>}
+                </div>
+                <div className="flex flex-1 flex-col gap-1 p-2.5">
+                  <p className="line-clamp-3 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
+                  <div className="mt-auto flex items-center justify-between pt-1">
+                    {i.price != null
+                      ? <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
+                      : <span className="text-[11px] text-slate-500">السعر عند التأكيد</span>}
+                    <button className="rounded-xl border-2 border-ink bg-sun px-2.5 py-1 text-sm font-extrabold"
+                      onClick={() => addLine({ kind: "pharmacy", key: `p-${i.id}`, product: { id: i.id, name: i.name, brand: null, type: i.type, available: true, price: i.price }, qty: 1 })}>+</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {cnext !== null && citems && citems.length > 0 && (
+            <button className={`${btn} w-full bg-white text-slate-700`} disabled={cloading}
+              onClick={() => loadCosmetics(cat, cq.trim().length >= 2 ? cq.trim() : "", cnext)}>{cloading ? "..." : "عرض المزيد"}</button>
+          )}
+          <p className="pt-2 text-center text-xs text-slate-500">نؤكد السعر والتوفر قبل التوصيل.</p>
         </main>
       )}
 
@@ -241,7 +320,7 @@ export default function ShopHome() {
           {cart.map((l) => (
             <div key={l.key} className="flex items-center justify-between gap-2">
               <p className="min-w-0 truncate text-sm" dir="auto">
-                {l.kind === "pharmacy" ? l.product.name : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
+                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <button className="h-8 w-8 rounded-full border-2 border-ink font-bold" onClick={() => setQty(l.key, l.qty - 1)}>−</button>
