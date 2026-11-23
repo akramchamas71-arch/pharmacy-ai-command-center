@@ -2,7 +2,7 @@
 // offline page so the installed app never shows a browser error screen.
 const OFFLINE = "/shop-offline.html";
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open("carelink-v1").then((c) => c.add(OFFLINE)));
+  e.waitUntil(caches.open("carelink-v2").then((c) => c.add(OFFLINE)));
   self.skipWaiting();
 });
 self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));

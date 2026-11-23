@@ -6,11 +6,11 @@ export const metadata: Metadata = {
   description: "اطلب أدويتك ومستلزماتك من الصيدليات الشريكة وتوصيل إلى البيت",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Carelink", statusBarStyle: "default" },
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-180.png" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f766e",
+  themeColor: "#9e5f69",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

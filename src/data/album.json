@@ -1,0 +1,86 @@
+[
+{
+"id": "a01",
+"title": "Carelink — كل ما تحتاجينه للعناية",
+"image": "/album/a01.jpg",
+"w": 614,
+"h": 1100
+},
+{
+"id": "a02",
+"title": "Carelink — أقسام العناية",
+"image": "/album/a02.jpg",
+"w": 733,
+"h": 1100
+},
+{
+"id": "a03",
+"title": "Neutrogena Retinol & Hydro Boost",
+"image": "/album/a03.jpg",
+"w": 1024,
+"h": 1024
+},
+{
+"id": "a04",
+"title": "NIVEA Pure Invisible & Whitening",
+"image": "/album/a04.jpg",
+"w": 1024,
+"h": 1024
+},
+{
+"id": "a05",
+"title": "DEBORAH — مجموعة المكياج",
+"image": "/album/a05.jpg",
+"w": 1024,
+"h": 1024
+},
+{
+"id": "a06",
+"title": "Mustela & Septona — عناية للصغار",
+"image": "/album/a06.jpg",
+"w": 880,
+"h": 1100
+},
+{
+"id": "a07",
+"title": "CeraVe Moisturising Lotion",
+"image": "/album/a07.jpg",
+"w": 880,
+"h": 1100
+},
+{
+"id": "a08",
+"title": "Cosmaline Nutri-Strength",
+"image": "/album/a08.jpg",
+"w": 880,
+"h": 1100
+},
+{
+"id": "a09",
+"title": "Garnier Micellar Collection",
+"image": "/album/a09.jpg",
+"w": 880,
+"h": 1100
+},
+{
+"id": "a10",
+"title": "Skin Care — العناية بالبشرة",
+"image": "/album/a10.jpg",
+"w": 1100,
+"h": 614
+},
+{
+"id": "a11",
+"title": "Makeup — التجميل",
+"image": "/album/a11.jpg",
+"w": 1100,
+"h": 614
+},
+{
+"id": "a12",
+"title": "Body Care & Deodorants",
+"image": "/album/a12.jpg",
+"w": 1100,
+"h": 614
+}
+]

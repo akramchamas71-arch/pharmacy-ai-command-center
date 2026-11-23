@@ -4,6 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { btn, input, resizeImage, shopFetch } from "./api";
+import album from "@/data/album.json";
+
+interface AlbumItem { id: string; title: string; image: string; w: number; h: number }
+const ALBUM = album as AlbumItem[];
 
 interface Product { id: string; name: string; brand: string | null; type: string; available: boolean; price?: number | null }
 interface DItem { id: string; name: string; cat: string; price: number; image: string }
@@ -23,7 +27,7 @@ const usd = (n: number) => `${Math.round(n)}$`;
 export default function ShopHome() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
-  const [tab, setTab] = useState<"pharmacy" | "cosmetics" | "lattafa" | "deborah">("pharmacy");
+  const [tab, setTab] = useState<"home" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album">("home");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
   const [cart, setCart] = useState<CartLine[]>([]);
 
@@ -38,6 +42,20 @@ export default function ShopHome() {
   const [brand, setBrand] = useState<string>("NEW");
   const [lq, setLq] = useState("");
   const [shown, setShown] = useState(40);
+
+  // album
+  const [photo, setPhoto] = useState<AlbumItem | null>(null);
+  const [asking, setAsking] = useState(false);
+
+  async function askAboutPhoto(p: AlbumItem) {
+    setAsking(true);
+    try {
+      await shopFetch("/api/shop/message", { body: { text: `[استفسار من الألبوم] ${p.title}\nأريد معرفة السعر والتوفر لما في هذه الصورة.\n(الصورة: ${p.image})` } });
+      router.push("/shop/chat");
+    } catch {
+      setAsking(false);
+    }
+  }
 
   // DEBORAH catalog
   const [dcat, setDcat] = useState<{ key: string; label: string }[]>([]);
@@ -221,19 +239,23 @@ export default function ShopHome() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 border-b-2 border-ink bg-teal-700 px-4 pt-3 text-white">
+      <header className="sticky top-0 z-10 border-b-2 border-ink bg-[#9e5f69] px-4 pt-3 text-white">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded-xl border-2 border-white/70" />
+            <div>
             <p className="font-display text-xl font-extrabold">Carelink</p>
             <p className="text-[11px] opacity-90">{me ? `أهلاً ${me.name ?? ""}` : "..."}</p>
+            </div>
           </div>
           <Link href="/shop/chat" className="rounded-full border-2 border-white px-3 py-1.5 text-sm font-bold">طلباتي 💬</Link>
         </div>
         {step === "browse" && (
-          <div className="mt-3 flex gap-1">
-            {([["pharmacy", "💊 أدوية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"]] as const).map(([k, label]) => (
+          <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
+            {([["home", "🏠"], ["pharmacy", "💊 أدوية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
-                className={`flex-1 whitespace-nowrap rounded-t-2xl px-1.5 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-teal-800" : "bg-teal-800/40 text-white"}`}>
+                className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
               </button>
             ))}
@@ -247,7 +269,7 @@ export default function ShopHome() {
           {searching && <p className="text-center text-sm text-slate-500">جارٍ البحث...</p>}
           {!searching && q.trim().length >= 2 && results.length === 0 && (
             <p className="rounded-2xl bg-white p-4 text-center text-sm text-slate-600">
-              لم نجده في الأدوية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-teal-700 underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
+              لم نجده في الأدوية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-[#9e5f69] underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
             </p>
           )}
           {q.trim().length < 2 && (
@@ -265,7 +287,7 @@ export default function ShopHome() {
                   <p className="truncate font-bold text-slate-900" dir="auto">{p.name}</p>
                   <p className="text-xs text-slate-500">
                     {p.brand ? `${p.brand} · ` : ""}
-                    {p.available ? <span className="text-teal-700">متوفر</span> : <span className="text-amber-700">نتحقق من توفره</span>}
+                    {p.available ? <span className="text-[#9e5f69]">متوفر</span> : <span className="text-amber-700">نتحقق من توفره</span>}
                     {RX(p.type) && <span className="mr-1 rounded-full bg-amber-100 px-2 text-amber-800">بوصفة</span>}
                   </p>
                 </div>
@@ -326,6 +348,67 @@ export default function ShopHome() {
         </main>
       )}
 
+      {step === "browse" && tab === "home" && (
+        <main className="flex-1 space-y-4 p-4 pb-28">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo.jpg" alt="Carelink — Beauty · Care · Confidence" className="mx-auto w-48 rounded-3xl" />
+          <p className="text-center text-sm font-bold text-slate-700">كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد</p>
+          {([
+            ["/brand/banner-skin.jpg", "العناية بالبشرة", () => { setTab("cosmetics"); setCat("skin"); setCitems(null); loadCosmetics("skin", "", 0); }],
+            ["/brand/banner-makeup.jpg", "المكياج — Deborah", () => setTab("deborah")],
+            ["/brand/banner-body.jpg", "العناية بالجسم ومزيلات العرق", () => { setTab("cosmetics"); setCat("body"); setCitems(null); loadCosmetics("body", "", 0); }],
+          ] as const).map(([src, label, go]) => (
+            <button key={src} onClick={go} className="block w-full overflow-hidden rounded-3xl border-2 border-ink shadow-pop-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={label} className="w-full" />
+            </button>
+          ))}
+          <div className="grid grid-cols-2 gap-3">
+            {([
+              ["pharmacy", "💊", "الأدوية", "ابحث بالاسم"],
+              ["cosmetics", "🧴", "كوزماتيك", "بشرة، شعر، أطفال..."],
+              ["lattafa", "✨", "عطور لطافة", "بالأسعار"],
+              ["album", "🖼️", "الألبوم", "اسأل عن أي صورة"],
+            ] as const).map(([k, icon, t, sub]) => (
+              <button key={k} onClick={() => setTab(k)} className="rounded-3xl border-2 border-ink bg-white p-4 text-right shadow-pop-sm">
+                <span className="text-2xl">{icon}</span>
+                <p className="mt-1 font-extrabold">{t}</p>
+                <p className="text-xs text-slate-500">{sub}</p>
+              </button>
+            ))}
+          </div>
+        </main>
+      )}
+
+      {step === "browse" && tab === "album" && (
+        <main className="flex-1 space-y-3 p-4 pb-28">
+          <p className="rounded-2xl bg-white p-3 text-center text-sm text-slate-700">اضغطي على أي صورة لتسألي عن منتجاتها وسعرها — نجيبك في «طلباتي».</p>
+          <div className="columns-2 gap-3 [&>*]:mb-3">
+            {ALBUM.map((p) => (
+              <button key={p.id} onClick={() => setPhoto(p)} className="block w-full break-inside-avoid overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.image} alt={p.title} loading="lazy" className="w-full" />
+              </button>
+            ))}
+          </div>
+          {photo && (
+            <div className="fixed inset-0 z-30 flex flex-col bg-black/85 p-4" onClick={() => setPhoto(null)}>
+              <div className="flex flex-1 items-center justify-center overflow-auto">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo.image} alt={photo.title} className="max-h-full max-w-full rounded-2xl" />
+              </div>
+              <div className="mx-auto w-full max-w-md space-y-2 pt-3" onClick={(e) => e.stopPropagation()}>
+                <p className="text-center text-sm font-bold text-white">{photo.title}</p>
+                <button className={`${btn} w-full bg-sun text-ink`} disabled={asking} onClick={() => askAboutPhoto(photo)}>
+                  {asking ? "جارٍ الإرسال..." : "اسألي عن السعر والتوفر 💬"}
+                </button>
+                <button className="w-full py-2 text-sm font-bold text-white/80" onClick={() => setPhoto(null)}>إغلاق</button>
+              </div>
+            </div>
+          )}
+        </main>
+      )}
+
       {step === "browse" && tab === "deborah" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
           <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">DEBORAH MILANO — مستحضرات تجميل إيطالية</p>
@@ -344,7 +427,7 @@ export default function ShopHome() {
                   <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-1 flex-col gap-1 p-2.5">
-                  <p className="text-[11px] font-bold text-teal-700">DEBORAH</p>
+                  <p className="text-[11px] font-bold text-[#9e5f69]">DEBORAH</p>
                   <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
                   <div className="mt-auto flex items-center justify-between pt-1">
                     <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
@@ -382,7 +465,7 @@ export default function ShopHome() {
                     : <span className="text-4xl opacity-40">✨</span>}
                 </div>
                 <div className="flex flex-1 flex-col gap-1 p-2.5">
-                  <p className="text-[11px] font-bold text-teal-700">{i.brand}{i.isNew ? " · جديد" : ""}</p>
+                  <p className="text-[11px] font-bold text-[#9e5f69]">{i.brand}{i.isNew ? " · جديد" : ""}</p>
                   <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
                   <p className="text-[11px] text-slate-500" dir="ltr">{i.size}</p>
                   <div className="mt-auto flex items-center justify-between pt-1">
@@ -438,7 +521,7 @@ export default function ShopHome() {
                 const f = e.target.files?.[0];
                 if (f) setRxImage(await resizeImage(f).catch(() => null));
               }} />
-              {rxImage && <p className="mt-2 text-xs font-bold text-teal-700">✓ تم إرفاق الوصفة</p>}
+              {rxImage && <p className="mt-2 text-xs font-bold text-[#9e5f69]">✓ تم إرفاق الوصفة</p>}
             </div>
           )}
           {deborahTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">مجموع Deborah: <b>{usd(deborahTotal)}</b> + كلفة التوصيل. اكتب الألوان/الدرجات المطلوبة في الملاحظات.</p>}
@@ -450,9 +533,9 @@ export default function ShopHome() {
       {cart.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t-2 border-ink bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {step === "browse" ? (
-            <button className={`${btn} w-full bg-teal-700 text-white`} onClick={() => setStep("checkout")}>متابعة الطلب ({count})</button>
+            <button className={`${btn} w-full bg-[#9e5f69] text-white`} onClick={() => setStep("checkout")}>متابعة الطلب ({count})</button>
           ) : (
-            <button className={`${btn} w-full bg-teal-700 text-white`}
+            <button className={`${btn} w-full bg-[#9e5f69] text-white`}
               disabled={busy || area.trim().length < 2 || address.trim().length < 3 || (needsRx && !rxImage)} onClick={submit}>
               {busy ? "جارٍ الإرسال..." : "أرسل الطلب"}
             </button>

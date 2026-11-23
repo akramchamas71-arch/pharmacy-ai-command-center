@@ -45,7 +45,7 @@ export default function ShopChat() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b-2 border-ink bg-teal-700 px-4 py-3 text-white">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b-2 border-ink bg-[#9e5f69] px-4 py-3 text-white">
         <Link href="/shop" className="rounded-full border-2 border-white px-3 py-1.5 text-sm font-bold">→ المتجر</Link>
         <p className="font-display text-lg font-extrabold">طلباتي ومحادثتي</p>
       </header>
@@ -55,9 +55,9 @@ export default function ShopChat() {
         {messages?.length === 0 && <p className="text-center text-sm text-slate-500">لا توجد طلبات بعد. اطلب من المتجر أو اكتب لنا هنا.</p>}
         {messages?.map((m) => (
           <div key={m.id} className={`flex ${m.fromCustomer ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] rounded-3xl border-2 border-ink px-4 py-2.5 text-sm shadow-[0_2px_0_#1d2b4f] ${m.fromCustomer ? "bg-white" : "bg-teal-700 text-white"}`}>
+            <div className={`max-w-[85%] rounded-3xl border-2 border-ink px-4 py-2.5 text-sm shadow-[0_2px_0_#1d2b4f] ${m.fromCustomer ? "bg-white" : "bg-[#9e5f69] text-white"}`}>
               <p className="whitespace-pre-wrap break-words" dir="auto">{m.text}</p>
-              <p className={`mt-1 text-[10px] ${m.fromCustomer ? "text-slate-400" : "text-teal-100"}`}>
+              <p className={`mt-1 text-[10px] ${m.fromCustomer ? "text-slate-400" : "text-white/70"}`}>
                 {new Date(m.at).toLocaleString("ar-LB", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}
               </p>
             </div>
@@ -79,7 +79,7 @@ export default function ShopChat() {
             }} />
           </label>
           <textarea rows={1} className="min-h-12 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-3 text-base focus:border-ink focus:outline-none" placeholder="اكتب رسالتك..." value={text} onChange={(e) => setText(e.target.value)} />
-          <button className={`${btn} shrink-0 bg-teal-700 px-4 text-white`} disabled={busy || !text.trim()} onClick={() => send()}>إرسال</button>
+          <button className={`${btn} shrink-0 bg-[#9e5f69] px-4 text-white`} disabled={busy || !text.trim()} onClick={() => send()}>إرسال</button>
         </div>
       </div>
     </>

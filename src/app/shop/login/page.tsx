@@ -66,8 +66,8 @@ export default function ShopLogin() {
   return (
     <main className="flex flex-1 flex-col justify-center gap-6 p-6">
       <div className="text-center">
-        <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full border-[2.5px] border-ink bg-teal-700 text-3xl text-white shadow-pop-sm">✚</div>
-        <h1 className="font-display text-2xl font-extrabold text-slate-900">Carelink</h1>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/logo.jpg" alt="Carelink — Beauty · Care · Confidence" className="mx-auto mb-2 w-56 rounded-3xl" />
         <p className="mt-1 text-sm text-slate-600">اطلب من الصيدليات الشريكة وتوصيل إلى بيتك</p>
       </div>
 
@@ -82,7 +82,7 @@ export default function ShopLogin() {
         <div className="space-y-3 rounded-3xl border-2 border-ink bg-white p-5 text-center">
           <p className="font-bold text-slate-800">بانتظار رسالتك على واتساب...</p>
           <p className="text-sm text-slate-600">أرسل الرسالة الجاهزة في واتساب، وسيتم دخولك هنا تلقائياً.</p>
-          {token && <p className="font-mono text-lg font-extrabold tracking-widest text-teal-700" dir="ltr">{token}</p>}
+          {token && <p className="font-mono text-lg font-extrabold tracking-widest text-[#9e5f69]" dir="ltr">{token}</p>}
           {link && (
             <a href={link} className={`${btn} block w-full bg-[#25D366] text-ink`}>افتح واتساب مرة أخرى</a>
           )}
