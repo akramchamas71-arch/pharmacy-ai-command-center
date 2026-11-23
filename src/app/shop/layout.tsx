@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ShopSW } from "./ShopSW";
+import { Splash } from "./Splash";
 
 export const metadata: Metadata = {
   title: "Carelink — اطلب من صيدليتك",
@@ -20,6 +21,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-[100dvh] bg-slate-50">
       <ShopSW />
+      <Splash />
       <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col">{children}</div>
     </div>
   );

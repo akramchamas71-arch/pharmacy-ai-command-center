@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { btn, input, resizeImage, shopFetch } from "./api";
 import album from "@/data/album.json";
 
-interface AlbumItem { id: string; title: string; image: string; w: number; h: number }
+interface AlbumItem { id: string; title: string; image: string; video?: string; w: number; h: number }
 const ALBUM = album as AlbumItem[];
 
 interface Product { id: string; name: string; brand: string | null; type: string; available: boolean; price?: number | null }
@@ -351,8 +351,11 @@ export default function ShopHome() {
       {step === "browse" && tab === "home" && (
         <main className="flex-1 space-y-4 p-4 pb-28">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.jpg" alt="Carelink — Beauty · Care · Confidence" className="mx-auto w-48 rounded-3xl" />
-          <p className="text-center text-sm font-bold text-slate-700">كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد</p>
+          <button onClick={() => setTab("album")} className="block w-full overflow-hidden rounded-3xl border-2 border-ink shadow-pop-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/collage.jpg" alt="Carelink — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد" className="w-full" />
+          </button>
+          <p className="text-center text-sm font-bold text-slate-700">حدّك وين ما كنت 💗 — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد</p>
           {([
             ["/brand/banner-skin.jpg", "العناية بالبشرة", () => { setTab("cosmetics"); setCat("skin"); setCitems(null); loadCosmetics("skin", "", 0); }],
             ["/brand/banner-makeup.jpg", "المكياج — Deborah", () => setTab("deborah")],
@@ -382,12 +385,15 @@ export default function ShopHome() {
 
       {step === "browse" && tab === "album" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <p className="rounded-2xl bg-white p-3 text-center text-sm text-slate-700">اضغطي على أي صورة لتسألي عن منتجاتها وسعرها — نجيبك في «طلباتي».</p>
+          <p className="rounded-2xl bg-white p-3 text-center text-sm text-slate-700">اضغطي على أي صورة أو فيديو لتسألي عن منتجاتها وسعرها — نجيبك في «طلباتي».</p>
           <div className="columns-2 gap-3 [&>*]:mb-3">
             {ALBUM.map((p) => (
               <button key={p.id} onClick={() => setPhoto(p)} className="block w-full break-inside-avoid overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.image} alt={p.title} loading="lazy" className="w-full" />
+                <span className="relative block">
+                  <img src={p.image} alt={p.title} loading="lazy" className="w-full" />
+                  {p.video && <span className="absolute inset-0 flex items-center justify-center"><span className="rounded-full bg-black/50 px-3 py-2 text-xl text-white">▶</span></span>}
+                </span>
               </button>
             ))}
           </div>
@@ -395,7 +401,9 @@ export default function ShopHome() {
             <div className="fixed inset-0 z-30 flex flex-col bg-black/85 p-4" onClick={() => setPhoto(null)}>
               <div className="flex flex-1 items-center justify-center overflow-auto">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo.image} alt={photo.title} className="max-h-full max-w-full rounded-2xl" />
+                {photo.video
+                  ? <video src={photo.video} poster={photo.image} controls autoPlay playsInline className="max-h-full max-w-full rounded-2xl" onClick={(e) => e.stopPropagation()} />
+                  : <img src={photo.image} alt={photo.title} className="max-h-full max-w-full rounded-2xl" />}
               </div>
               <div className="mx-auto w-full max-w-md space-y-2 pt-3" onClick={(e) => e.stopPropagation()}>
                 <p className="text-center text-sm font-bold text-white">{photo.title}</p>
