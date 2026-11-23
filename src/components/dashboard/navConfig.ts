@@ -16,6 +16,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/lattafa", label: "عطور لطافة", icon: "✨", anyOf: [PERMISSION_KEYS.ORDERS_READ, PERMISSION_KEYS.PRODUCTS_MANAGE] },
   { href: "/dashboard/cosmetics", label: "كوزماتيك", icon: "🧴", anyOf: [PERMISSION_KEYS.ORDERS_READ, PERMISSION_KEYS.PRODUCTS_MANAGE] },
   { href: "/dashboard/deborah", label: "Deborah", icon: "💄", anyOf: [PERMISSION_KEYS.ORDERS_READ, PERMISSION_KEYS.PRODUCTS_MANAGE] },
+  { href: "/dashboard/consultations", label: "الاستشارات", icon: "🩺", anyOf: [PERMISSION_KEYS.WHATSAPP_SEND] },
   { href: "/dashboard/inventory", label: "المخزون", icon: "📦", anyOf: [PERMISSION_KEYS.INVENTORY_READ] },
   { href: "/dashboard/orders", label: "الطلبات", icon: "🧾", anyOf: [PERMISSION_KEYS.ORDERS_READ] },
   { href: "/dashboard/whatsapp", label: "محادثات واتساب", icon: "💬", anyOf: [PERMISSION_KEYS.WHATSAPP_SEND] },

@@ -958,6 +958,37 @@ async function send_whatsapp_message(input: unknown) {
   return sendReply({ conversationId, text, userId: aiUser.id });
 }
 
+
+// ---------------------------------------------------------------------------
+// refer_consultation (app «استشارة» tab): hand a medical question to the command center
+// ---------------------------------------------------------------------------
+
+const referConsultationSchema = z.object({
+  question: z.string().min(2).max(2000),
+  summary: z.string().min(2).max(1000),
+  specialist: z.enum(["pharmacist", "doctor"]).default("pharmacist"),
+  urgent: z.boolean().default(false),
+});
+
+/**
+ * Owner's rule (23 Nov 2026): the AI answers general consultations itself; anything that needs a
+ * pharmacist or a doctor is referred to the command center («الاستشارات» page), where staff follow
+ * up with a pharmacy or a specialist and reply later in the same conversation. Free of charge.
+ * Stored as an AuditLog row (no schema migration); the conversation stays with the AI.
+ */
+async function refer_consultation(input: unknown, context?: AiToolContext) {
+  const aiUser = await requireAiPermission(PERMISSIONS.WHATSAPP_SEND);
+  const data = referConsultationSchema.parse(input);
+  if (!context?.conversationId) throw new BusinessRuleError("هذه الأداة تتطلب محادثة حقيقية.");
+  await logAudit({
+    userId: aiUser.id,
+    action: "consult.referred",
+    entity: `WhatsappConversation:${context.conversationId}`,
+    newValue: { ...data, at: new Date().toISOString() },
+  });
+  return { referred: true, note: "أُحيلت الاستشارة إلى فريق Carelink — الرد يحتاج وقتاً وليس فورياً." };
+}
+
 // ---------------------------------------------------------------------------
 // 10. search_documents
 // ---------------------------------------------------------------------------
@@ -1219,6 +1250,21 @@ export const AI_TOOLS: AiToolSpec[] = [
       required: ["conversationId", "text"],
     },
     handler: send_whatsapp_message,
+  },
+  {
+    name: "refer_consultation",
+    description: "يحيل استشارة طبية من الزبون إلى مركز القيادة (فريق Carelink يتابع مع صيدلي أو طبيب مختص ويرد لاحقاً — ليس فورياً). استعملها عندما يحتاج السؤال قراراً شخصياً من صيدلي أو طبيب (جرعة لطفل أو حامل أو مرضع، أمراض مزمنة، أدوية بوصفة، تشخيص، أعراض مستمرة)، أو إذا طلب الزبون ذلك. question = سؤال الزبون كما كتبه، summary = ملخص قصير بالمعلومات المهمة (العمر، الأعراض، الأدوية الحالية...).",
+    input_schema: {
+      type: "object",
+      properties: {
+        question: { type: "string" },
+        summary: { type: "string" },
+        specialist: { type: "string", enum: ["pharmacist", "doctor"] },
+        urgent: { type: "boolean" },
+      },
+      required: ["question", "summary"],
+    },
+    handler: refer_consultation,
   },
   {
     name: "search_documents",

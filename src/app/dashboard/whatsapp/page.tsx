@@ -31,6 +31,13 @@ export default function WhatsAppInboxPage() {
   const [listError, setListError] = useState<string | null>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Deep link from «الاستشارات»: /dashboard/whatsapp?c=<conversationId>
+  useEffect(() => {
+    try {
+      const c = new URLSearchParams(window.location.search).get("c");
+      if (c) setSelectedId(c);
+    } catch {}
+  }, []);
   const [conversationDetail, setConversationDetail] = useState<ConversationDetailDto | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
   const [threadError, setThreadError] = useState<string | null>(null);

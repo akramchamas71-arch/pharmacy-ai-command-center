@@ -27,7 +27,7 @@ const usd = (n: number) => `${Math.round(n)}$`;
 export default function ShopHome() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
-  const [tab, setTab] = useState<"home" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album">("home");
+  const [tab, setTab] = useState<"home" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album" | "consult">("home");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
   const [cart, setCart] = useState<CartLine[]>([]);
 
@@ -42,6 +42,26 @@ export default function ShopHome() {
   const [brand, setBrand] = useState<string>("NEW");
   const [lq, setLq] = useState("");
   const [shown, setShown] = useState(40);
+
+  // consultation
+  const [cText, setCText] = useState("");
+  const [cImage, setCImage] = useState<string | null>(null);
+  const [cBusy, setCBusy] = useState(false);
+  const [cErr, setCErr] = useState<string | null>(null);
+
+  async function sendConsult() {
+    setCBusy(true);
+    setCErr(null);
+    try {
+      await shopFetch("/api/shop/message", { body: { text: `[استشارة طبية]\n${cText.trim()}`, image: cImage ?? undefined } });
+      setCText("");
+      setCImage(null);
+      router.push("/shop/chat");
+    } catch (e) {
+      setCErr(e instanceof Error ? e.message : "تعذّر الإرسال");
+      setCBusy(false);
+    }
+  }
 
   // album
   const [photo, setPhoto] = useState<AlbumItem | null>(null);
@@ -253,7 +273,7 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
-            {([["home", "🏠"], ["pharmacy", "💊 صيدلية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"]] as const).map(([k, label]) => (
+            {([["home", "🏠"], ["pharmacy", "💊 صيدلية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"], ["consult", "🩺 استشارة"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
@@ -372,6 +392,7 @@ export default function ShopHome() {
               ["cosmetics", "🧴", "كوزماتيك", "بشرة، شعر، أطفال..."],
               ["lattafa", "✨", "عطور لطافة", "بالأسعار"],
               ["album", "🖼️", "الألبوم", "اسأل عن أي صورة"],
+              ["consult", "🩺", "استشارة مجانية", "اسأل عن دواء أو عناية"],
             ] as const).map(([k, icon, t, sub]) => (
               <button key={k} onClick={() => setTab(k)} className="rounded-3xl border-2 border-ink bg-white p-4 text-right shadow-pop-sm">
                 <span className="text-2xl">{icon}</span>
@@ -380,6 +401,28 @@ export default function ShopHome() {
               </button>
             ))}
           </div>
+        </main>
+      )}
+
+      {step === "browse" && tab === "consult" && (
+        <main className="flex-1 space-y-3 p-4 pb-28">
+          <div className="rounded-3xl border-2 border-ink bg-white p-4">
+            <p className="text-lg font-extrabold">🩺 استشارة مجانية</p>
+            <p className="mt-1 text-sm text-slate-700">اسألي عن أي دواء أو منتج عناية: طريقة الاستعمال، البديل، الروتين المناسب لبشرتك... يجيبك مساعد Carelink فوراً، وإذا احتاج سؤالك صيدلياً أو طبيباً مختصاً نحوّله لفريقنا ويصلك الرد في «طلباتي» بعد بعض الوقت.</p>
+          </div>
+          <textarea className={input} rows={5} placeholder="اكتبي سؤالك هنا... (اذكري العمر والأدوية التي تأخذينها إن وُجدت)" value={cText} onChange={(e) => setCText(e.target.value)} />
+          <label className="flex cursor-pointer items-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-3 text-sm font-bold text-slate-600">
+            📷 {cImage ? "✓ أُرفقت صورة (اضغطي للتغيير)" : "أرفقي صورة (علبة دواء، وصفة، مشكلة بالبشرة) — اختياري"}
+            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+              const f = e.target.files?.[0];
+              if (f) setCImage(await resizeImage(f).catch(() => null));
+            }} />
+          </label>
+          {cErr && <p className="rounded-2xl border-2 border-red-300 bg-red-50 p-3 text-sm font-bold text-red-700">{cErr}</p>}
+          <button className={`${btn} w-full bg-[#9e5f69] text-white`} disabled={cBusy || cText.trim().length < 3} onClick={sendConsult}>
+            {cBusy ? "جارٍ الإرسال..." : "أرسلي الاستشارة"}
+          </button>
+          <p className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-900">⚠️ المعلومات المقدّمة عامة ولا تغني عن استشارة الطبيب. في الحالات الطارئة (ضيق نفس، ألم في الصدر، نزيف...) توجّهي فوراً إلى أقرب طوارئ أو اتصلي بالصليب الأحمر 140.</p>
         </main>
       )}
 
