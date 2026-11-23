@@ -381,6 +381,8 @@ export default function ShopHome() {
       {step === "browse" && tab === "home" && (
         <main className="flex-1 space-y-4 p-4 pb-28">
           {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/promo-delivery.jpg" alt="Carelink — طلبك يوصل إلى باب بيتك" className="block w-full rounded-3xl border-2 border-ink shadow-pop-sm" />
           <button onClick={() => setTab("album")} className="block w-full overflow-hidden rounded-3xl border-2 border-ink shadow-pop-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/collage.jpg" alt="Carelink — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد" className="w-full" />
