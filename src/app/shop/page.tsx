@@ -5,6 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { btn, input, resizeImage, shopFetch } from "./api";
 import album from "@/data/album.json";
+import tips from "@/data/health-tips.json";
+
+interface Tip { t: string; x: string; s: string; u: string }
+const TIPS = tips as Tip[];
+/** Index of today's tip (Beirut date), one tip per day, cycling. */
+function tipIndex(offset = 0) {
+  const d = new Date(Date.now() + 2 * 3600 * 1000);
+  const day = Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) / 86400000) - offset;
+  return ((day % TIPS.length) + TIPS.length) % TIPS.length;
+}
 
 interface AlbumItem { id: string; title: string; image: string; video?: string; w: number; h: number }
 const ALBUM = album as AlbumItem[];
@@ -27,7 +37,7 @@ const usd = (n: number) => `${Math.round(n)}$`;
 export default function ShopHome() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
-  const [tab, setTab] = useState<"home" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album" | "consult">("home");
+  const [tab, setTab] = useState<"home" | "consult" | "tips" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album">("home");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
   const [cart, setCart] = useState<CartLine[]>([]);
 
@@ -273,7 +283,7 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
-            {([["home", "🏠"], ["pharmacy", "💊 صيدلية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"], ["consult", "🩺 استشارة"]] as const).map(([k, label]) => (
+            {([["home", "🏠"], ["consult", "🩺 استشارة"], ["tips", "💡 معلومة اليوم"], ["pharmacy", "💊 صيدلية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
@@ -376,6 +386,11 @@ export default function ShopHome() {
             <img src="/brand/collage.jpg" alt="Carelink — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد" className="w-full" />
           </button>
           <p className="text-center text-sm font-bold text-slate-700">حدّك وين ما كنت 💗 — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد</p>
+          <button onClick={() => setTab("tips")} className="block w-full rounded-3xl border-2 border-ink bg-[#f7ecee] p-4 text-right shadow-pop-sm">
+            <p className="text-xs font-bold text-[#9e5f69]">💡 معلومة صحية اليوم</p>
+            <p className="mt-1 font-extrabold">{TIPS[tipIndex()].t}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-slate-700">{TIPS[tipIndex()].x}</p>
+          </button>
           {([
             ["/brand/banner-skin.jpg", "العناية بالبشرة", () => { setTab("cosmetics"); setCat("skin"); setCitems(null); loadCosmetics("skin", "", 0); }],
             ["/brand/banner-makeup.jpg", "المكياج — Deborah", () => setTab("deborah")],
@@ -388,11 +403,11 @@ export default function ShopHome() {
           ))}
           <div className="grid grid-cols-2 gap-3">
             {([
+              ["consult", "🩺", "استشارة مجانية", "اسأل عن دواء أو عناية"],
               ["pharmacy", "💊", "الصيدلية", "ابحث بالاسم"],
               ["cosmetics", "🧴", "كوزماتيك", "بشرة، شعر، أطفال..."],
               ["lattafa", "✨", "عطور لطافة", "بالأسعار"],
               ["album", "🖼️", "الألبوم", "اسأل عن أي صورة"],
-              ["consult", "🩺", "استشارة مجانية", "اسأل عن دواء أو عناية"],
             ] as const).map(([k, icon, t, sub]) => (
               <button key={k} onClick={() => setTab(k)} className="rounded-3xl border-2 border-ink bg-white p-4 text-right shadow-pop-sm">
                 <span className="text-2xl">{icon}</span>
@@ -401,6 +416,23 @@ export default function ShopHome() {
               </button>
             ))}
           </div>
+        </main>
+      )}
+
+      {step === "browse" && tab === "tips" && (
+        <main className="flex-1 space-y-3 p-4 pb-28">
+          {[0, 1, 2, 3, 4, 5, 6].map((o) => {
+            const tip = TIPS[tipIndex(o)];
+            return (
+              <div key={o} className={`rounded-3xl border-2 bg-white p-4 ${o === 0 ? "border-ink shadow-pop-sm" : "border-slate-200"}`}>
+                <p className="text-xs font-bold text-[#9e5f69]">{o === 0 ? "💡 معلومة اليوم" : o === 1 ? "أمس" : `قبل ${o} أيام`}</p>
+                <p className={`mt-1 font-extrabold ${o === 0 ? "text-lg" : ""}`}>{tip.t}</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-700">{tip.x}</p>
+                <a href={tip.u} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-bold text-[#9e5f69] underline">المصدر: {tip.s} ↗</a>
+              </div>
+            );
+          })}
+          <p className="text-center text-xs text-slate-500">معلومات عامة للتوعية لا تغني عن استشارة الطبيب. عندك سؤال؟ <button className="font-bold text-[#9e5f69] underline" onClick={() => setTab("consult")}>اسألي في الاستشارة المجانية</button></p>
         </main>
       )}
 
