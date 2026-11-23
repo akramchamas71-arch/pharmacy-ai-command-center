@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import { btn, input, resizeImage, shopFetch } from "./api";
 
 interface Product { id: string; name: string; brand: string | null; type: string; available: boolean; price?: number | null }
+interface DItem { id: string; name: string; cat: string; price: number; image: string }
 interface CItem { id: string; name: string; type: string; price: number | null; image: string | null; available: boolean }
 interface LItem { id: string; brand: string; brandKey: string; name: string; size: string; price: number; isNew: boolean; image: string | null }
 type CartLine =
   | { kind: "pharmacy"; key: string; product: Product; qty: number }
-  | { kind: "lattafa"; key: string; item: LItem; qty: number };
+  | { kind: "lattafa"; key: string; item: LItem; qty: number }
+  | { kind: "deborah"; key: string; item: DItem; qty: number };
 interface Me { name: string | null; phone: string; address: string | null }
 
 const RX = (t: string) => t === "PRESCRIPTION";
@@ -21,7 +23,7 @@ const usd = (n: number) => `${Math.round(n)}$`;
 export default function ShopHome() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
-  const [tab, setTab] = useState<"pharmacy" | "cosmetics" | "lattafa">("pharmacy");
+  const [tab, setTab] = useState<"pharmacy" | "cosmetics" | "lattafa" | "deborah">("pharmacy");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
   const [cart, setCart] = useState<CartLine[]>([]);
 
@@ -36,6 +38,11 @@ export default function ShopHome() {
   const [brand, setBrand] = useState<string>("NEW");
   const [lq, setLq] = useState("");
   const [shown, setShown] = useState(40);
+
+  // DEBORAH catalog
+  const [dcat, setDcat] = useState<{ key: string; label: string }[]>([]);
+  const [ditems, setDitems] = useState<DItem[] | null>(null);
+  const [dsel, setDsel] = useState("ALL");
 
   // drug browse (before searching)
   const [letter, setLetter] = useState("");
@@ -88,6 +95,14 @@ export default function ShopHome() {
       shopFetch<{ items: LItem[] }>("/api/shop/lattafa").then((d) => setCatalog(d.items)).catch(() => setCatalog([]));
     }
   }, [tab, catalog]);
+
+  useEffect(() => {
+    if (tab === "deborah" && !ditems) {
+      shopFetch<{ categories: { key: string; label: string }[]; items: DItem[] }>("/api/shop/deborah")
+        .then((d) => { setDcat(d.categories); setDitems(d.items); })
+        .catch(() => setDitems([]));
+    }
+  }, [tab, ditems]);
 
   async function loadDrugs(l: string, offset: number) {
     setDloading(true);
@@ -177,6 +192,7 @@ export default function ShopHome() {
   const needsRx = cart.some((l) => l.kind === "pharmacy" && RX(l.product.type));
   const count = cart.reduce((s, l) => s + l.qty, 0);
   const lattafaTotal = cart.reduce((s, l) => s + (l.kind === "lattafa" ? l.item.price * l.qty : 0), 0);
+  const deborahTotal = cart.reduce((s, l) => s + (l.kind === "deborah" ? l.item.price * l.qty : 0), 0);
 
   async function submit() {
     setBusy(true);
@@ -186,6 +202,7 @@ export default function ShopHome() {
         body: {
           items: cart.filter((l) => l.kind === "pharmacy").map((l) => ({ productId: (l as Extract<CartLine, { kind: "pharmacy" }>).product.id, qty: l.qty })),
           lattafa: cart.filter((l) => l.kind === "lattafa").map((l) => ({ id: (l as Extract<CartLine, { kind: "lattafa" }>).item.id, qty: l.qty })),
+          deborah: cart.filter((l) => l.kind === "deborah").map((l) => ({ id: (l as Extract<CartLine, { kind: "deborah" }>).item.id, qty: l.qty })),
           area, address, name: name || undefined, notes: notes || undefined,
           prescription: needsRx ? rxImage : undefined,
         },
@@ -214,9 +231,9 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="mt-3 flex gap-1">
-            {([["pharmacy", "💊 أدوية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"]] as const).map(([k, label]) => (
+            {([["pharmacy", "💊 أدوية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
-                className={`flex-1 rounded-t-2xl px-3 py-2 text-sm font-extrabold ${tab === k ? "bg-slate-50 text-teal-800" : "bg-teal-800/40 text-white"}`}>
+                className={`flex-1 whitespace-nowrap rounded-t-2xl px-1.5 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-teal-800" : "bg-teal-800/40 text-white"}`}>
                 {label}
               </button>
             ))}
@@ -309,6 +326,38 @@ export default function ShopHome() {
         </main>
       )}
 
+      {step === "browse" && tab === "deborah" && (
+        <main className="flex-1 space-y-3 p-4 pb-28">
+          <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">DEBORAH MILANO — مستحضرات تجميل إيطالية</p>
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+            <button className={chip(dsel === "ALL")} onClick={() => setDsel("ALL")}>الكل</button>
+            {dcat.map((c) => (
+              <button key={c.key} className={chip(dsel === c.key)} onClick={() => setDsel(c.key)}>{c.label}</button>
+            ))}
+          </div>
+          {ditems === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
+          <div className="grid grid-cols-2 gap-3">
+            {(ditems ?? []).filter((i) => dsel === "ALL" || i.cat === dsel).map((i) => (
+              <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
+                <div className="flex aspect-square items-center justify-center bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-contain" />
+                </div>
+                <div className="flex flex-1 flex-col gap-1 p-2.5">
+                  <p className="text-[11px] font-bold text-teal-700">DEBORAH</p>
+                  <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
+                  <div className="mt-auto flex items-center justify-between pt-1">
+                    <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
+                    <button className="rounded-xl border-2 border-ink bg-sun px-2.5 py-1 text-sm font-extrabold" onClick={() => addLine({ kind: "deborah", key: `d-${i.id}`, item: i, qty: 1 })}>+</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="pt-2 text-center text-xs text-slate-500">الألوان والدرجات حسب المتوفر — اذكر اللون المطلوب في الملاحظات. نؤكد التوفر قبل التوصيل.</p>
+        </main>
+      )}
+
       {step === "browse" && tab === "lattafa" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
           <input className={input} placeholder="ابحث عن عطر: Yara، Asad، Khamrah..." value={lq} onChange={(e) => { setLq(e.target.value); setShown(40); }} />
@@ -357,7 +406,7 @@ export default function ShopHome() {
           {cart.map((l) => (
             <div key={l.key} className="flex items-center justify-between gap-2">
               <p className="min-w-0 truncate text-sm" dir="auto">
-                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
+                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : l.kind === "deborah" ? `DEBORAH ${l.item.name} — ${usd(l.item.price)}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <button className="h-8 w-8 rounded-full border-2 border-ink font-bold" onClick={() => setQty(l.key, l.qty - 1)}>−</button>
@@ -366,6 +415,7 @@ export default function ShopHome() {
               </div>
             </div>
           ))}
+          {deborahTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">مجموع Deborah: {usd(deborahTotal)}</p>}
           {lattafaTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">مجموع عطور لطافة: {usd(lattafaTotal)}</p>}
         </section>
       )}
@@ -391,6 +441,7 @@ export default function ShopHome() {
               {rxImage && <p className="mt-2 text-xs font-bold text-teal-700">✓ تم إرفاق الوصفة</p>}
             </div>
           )}
+          {deborahTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">مجموع Deborah: <b>{usd(deborahTotal)}</b> + كلفة التوصيل. اكتب الألوان/الدرجات المطلوبة في الملاحظات.</p>}
           {lattafaTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">مجموع عطور لطافة: <b>{usd(lattafaTotal)}</b> + كلفة التوصيل تُبلَّغ بها.</p>}
           {error && <p className="rounded-2xl border-2 border-red-300 bg-red-50 p-3 text-sm font-bold text-red-700">{error}</p>}
         </main>

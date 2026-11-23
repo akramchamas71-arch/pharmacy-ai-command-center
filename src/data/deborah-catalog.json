@@ -1,0 +1,314 @@
+[
+{
+"id": "d01",
+"name": "RADIANCE CREATOR HIGHLIGHT CONCEALER",
+"cat": "face",
+"price": 24,
+"listPrice": 23.6,
+"image": "/deborah/d01.jpg"
+},
+{
+"id": "d02",
+"name": "LOVE MY LASHES TRANSPARENT MASCARA",
+"cat": "eyes",
+"price": 10,
+"listPrice": 10,
+"image": "/deborah/d02.jpg"
+},
+{
+"id": "d03",
+"name": "DRESS ME PERFECT CONCEALER",
+"cat": "face",
+"price": 13,
+"listPrice": 13.35,
+"image": "/deborah/d03.jpg"
+},
+{
+"id": "d04",
+"name": "LOVE MY LASHES MASCARA LONG",
+"cat": "eyes",
+"price": 8,
+"listPrice": 7.77,
+"image": "/deborah/d04.jpg"
+},
+{
+"id": "d05",
+"name": "DREAM LOOK MASCARA",
+"cat": "eyes",
+"price": 17,
+"listPrice": 16.65,
+"image": "/deborah/d05.jpg"
+},
+{
+"id": "d06",
+"name": "24ORE ABSOLUTE VOLUME MASCARA",
+"cat": "eyes",
+"price": 17,
+"listPrice": 16.65,
+"image": "/deborah/d06.jpg"
+},
+{
+"id": "d07",
+"name": "7 DAYS LONG NAIL POLISH",
+"cat": "nails",
+"price": 5,
+"listPrice": 4.5,
+"image": "/deborah/d07.jpg"
+},
+{
+"id": "d08",
+"name": "NAIL SPACE (HARDENER / CUTICLE SCRUB / BASE / TOP COAT)",
+"cat": "nails",
+"price": 15,
+"listPrice": 15,
+"image": "/deborah/d08.jpg"
+},
+{
+"id": "d09",
+"name": "24ORE CUSHION EYELINER",
+"cat": "eyes",
+"price": 17,
+"listPrice": 16.65,
+"image": "/deborah/d09.jpg"
+},
+{
+"id": "d10",
+"name": "DROPS OF BLUSH LIQUID BLUSH",
+"cat": "face",
+"price": 20,
+"listPrice": 20,
+"image": "/deborah/d10.jpg"
+},
+{
+"id": "d11",
+"name": "GEL EFFECT NAIL POLISH",
+"cat": "nails",
+"price": 5,
+"listPrice": 4.5,
+"image": "/deborah/d11.jpg"
+},
+{
+"id": "d12",
+"name": "MAKE-UP REMOVER PEN",
+"cat": "face",
+"price": 10,
+"listPrice": 10,
+"image": "/deborah/d12.jpg"
+},
+{
+"id": "d13",
+"name": "24ORE PERFECT CONCEALER STICK",
+"cat": "face",
+"price": 11,
+"listPrice": 11.1,
+"image": "/deborah/d13.jpg"
+},
+{
+"id": "d14",
+"name": "24ORE PERFECT PRIMER",
+"cat": "face",
+"price": 15,
+"listPrice": 15,
+"image": "/deborah/d14.jpg"
+},
+{
+"id": "d15",
+"name": "ULTRALINER EYELINER",
+"cat": "eyes",
+"price": 13,
+"listPrice": 13.33,
+"image": "/deborah/d15.jpg"
+},
+{
+"id": "d16",
+"name": "NATURAL BLUSH",
+"cat": "face",
+"price": 11,
+"listPrice": 11.3,
+"image": "/deborah/d16.jpg"
+},
+{
+"id": "d17",
+"name": "CONTOURING PALETTE",
+"cat": "face",
+"price": 20,
+"listPrice": 20.3,
+"image": "/deborah/d17.jpg"
+},
+{
+"id": "d18",
+"name": "SECRETS OF CONTOURING DUO PEN",
+"cat": "face",
+"price": 17,
+"listPrice": 16.65,
+"image": "/deborah/d18.jpg"
+},
+{
+"id": "d19",
+"name": "EYESHADOW MONO",
+"cat": "eyes",
+"price": 9,
+"listPrice": 8.9,
+"image": "/deborah/d19.jpg"
+},
+{
+"id": "d20",
+"name": "EYESHADOW TRIO",
+"cat": "eyes",
+"price": 15,
+"listPrice": 15,
+"image": "/deborah/d20.jpg"
+},
+{
+"id": "d21",
+"name": "LA CIPRIA 30 POWDER",
+"cat": "face",
+"price": 10,
+"listPrice": 10,
+"image": "/deborah/d21.jpg"
+},
+{
+"id": "d22",
+"name": "EYELINER PENCIL",
+"cat": "eyes",
+"price": 6,
+"listPrice": 6.2,
+"image": "/deborah/d22.jpg"
+},
+{
+"id": "d23",
+"name": "EXTRA EYE PENCIL",
+"cat": "eyes",
+"price": 13,
+"listPrice": 12.8,
+"image": "/deborah/d23.jpg"
+},
+{
+"id": "d24",
+"name": "KAJAL PENCIL",
+"cat": "eyes",
+"price": 10,
+"listPrice": 9.5,
+"image": "/deborah/d24.jpg"
+},
+{
+"id": "d25",
+"name": "24ORE EXTRA EYELINER PEN",
+"cat": "eyes",
+"price": 10,
+"listPrice": 10,
+"image": "/deborah/d25.jpg"
+},
+{
+"id": "d26",
+"name": "EYELINER PEN GOLD",
+"cat": "eyes",
+"price": 9,
+"listPrice": 9,
+"image": "/deborah/d26.jpg"
+},
+{
+"id": "d27",
+"name": "24ORE EYE PENCIL",
+"cat": "eyes",
+"price": 9,
+"listPrice": 8.5,
+"image": "/deborah/d27.jpg"
+},
+{
+"id": "d28",
+"name": "24ORE LIP PENCIL",
+"cat": "lips",
+"price": 8,
+"listPrice": 7.8,
+"image": "/deborah/d28.jpg"
+},
+{
+"id": "d29",
+"name": "LIPLINER PENCIL",
+"cat": "lips",
+"price": 6,
+"listPrice": 6.2,
+"image": "/deborah/d29.jpg"
+},
+{
+"id": "d30",
+"name": "24ORE WATERPROOF EYE PENCIL",
+"cat": "eyes",
+"price": 8,
+"listPrice": 8.4,
+"image": "/deborah/d30.jpg"
+},
+{
+"id": "d31",
+"name": "BB CREAM 5IN1 SPF20",
+"cat": "face",
+"price": 16,
+"listPrice": 16,
+"image": "/deborah/d31.jpg"
+},
+{
+"id": "d32",
+"name": "DD DAILY DREAM FOUNDATION SPF15",
+"cat": "face",
+"price": 22,
+"listPrice": 22.2,
+"image": "/deborah/d32.jpg"
+},
+{
+"id": "d33",
+"name": "BRONZER COMPACT POWDER",
+"cat": "face",
+"price": 22,
+"listPrice": 22.2,
+"image": "/deborah/d33.jpg"
+},
+{
+"id": "d34",
+"name": "MILANO GOLD LIPSTICK",
+"cat": "lips",
+"price": 15,
+"listPrice": 15,
+"image": "/deborah/d34.jpg"
+},
+{
+"id": "d35",
+"name": "CIPRIA ULTRAFINE COMPACT POWDER",
+"cat": "face",
+"price": 13,
+"listPrice": 13.32,
+"image": "/deborah/d35.jpg"
+},
+{
+"id": "d36",
+"name": "NEWSKIN COMPACT FOUNDATION",
+"cat": "face",
+"price": 22,
+"listPrice": 22.2,
+"image": "/deborah/d36.jpg"
+},
+{
+"id": "d37",
+"name": "LOVE MY LASHES MASCARA VOLUME",
+"cat": "eyes",
+"price": 8,
+"listPrice": 7.77,
+"image": "/deborah/d37.jpg"
+},
+{
+"id": "d38",
+"name": "ABSOLUTE LASTING LIQUID LIPSTICK",
+"cat": "lips",
+"price": 13,
+"listPrice": 13.32,
+"image": "/deborah/d38.jpg"
+},
+{
+"id": "d39",
+"name": "IL ROSSETTO LIPSTICK",
+"cat": "lips",
+"price": 8,
+"listPrice": 7.7,
+"image": "/deborah/d39.jpg"
+}
+]

@@ -4,10 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { getCustomerSession, unauthorized } from "@/lib/customerAuth";
 import { addAppMessage, APP_ORDER_PREFIX, wakeAgent } from "@/lib/shop";
 import { getLattafaItem } from "@/lib/lattafa";
+import { deborahProductName, ensureDeborahProduct, getDeborahBranch, getDeborahItem } from "@/lib/deborah";
 
 const schema = z.object({
   items: z.array(z.object({ productId: z.string().min(1), qty: z.number().int().min(1).max(20) })).max(20).default([]),
   lattafa: z.array(z.object({ id: z.string().min(1), qty: z.number().int().min(1).max(20) })).max(20).default([]),
+  deborah: z.array(z.object({ id: z.string().min(1), qty: z.number().int().min(1).max(20) })).max(20).default([]),
   area: z.string().trim().min(2).max(80),
   address: z.string().trim().min(3).max(300),
   name: z.string().trim().max(80).optional(),
@@ -20,13 +22,26 @@ export async function POST(req: NextRequest) {
   if (!s) return unauthorized();
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "تحقق من الأصناف والمنطقة والعنوان." }, { status: 400 });
-  const { items, lattafa, area, address, name, notes, prescription } = parsed.data;
-  if (items.length + lattafa.length === 0) return NextResponse.json({ error: "السلة فارغة." }, { status: 400 });
+  const { items, lattafa, deborah, area, address, name, notes, prescription } = parsed.data;
+  if (items.length + lattafa.length + deborah.length === 0) return NextResponse.json({ error: "السلة فارغة." }, { status: 400 });
   const lattafaLines: string[] = [];
   for (const l of lattafa) {
     const it = getLattafaItem(l.id);
     if (!it) return NextResponse.json({ error: "أحد أصناف لطافة لم يعد متوفراً في القائمة." }, { status: 400 });
     lattafaLines.push(`- ${it.brand} ${it.name} ${it.size} × ${l.qty} — سعر الزبون ${it.price}$ للقطعة (رمز ${it.code ?? it.id})`);
+  }
+
+  // DEBORAH MILANO: owner's rule — handled ONLY by صيدلية الجواد كير, fixed customer price.
+  const deborahLines: string[] = [];
+  if (deborah.length) {
+    const branch = await getDeborahBranch();
+    if (!branch) return NextResponse.json({ error: "تعذّر تحديد الصيدلية المسؤولة عن منتجات Deborah." }, { status: 400 });
+    for (const d of deborah) {
+      const it = getDeborahItem(d.id);
+      if (!it) return NextResponse.json({ error: "أحد أصناف Deborah لم يعد متوفراً في القائمة." }, { status: 400 });
+      const productId = await ensureDeborahProduct(it);
+      deborahLines.push(`- ${deborahProductName(it)} × ${d.qty} — سعر الزبون ${it.price}$ للقطعة (productId: ${productId}، branchId: ${branch.id})`);
+    }
   }
 
   const products = await prisma.product.findMany({
@@ -59,6 +74,7 @@ export async function POST(req: NextRequest) {
     `العنوان: ${address}`,
     ...(lines.length ? ["الأصناف (من الصيدلية):", ...lines] : []),
     ...(lattafaLines.length ? ["أصناف شركة لطافة (السعر ثابت ومعروف):", ...lattafaLines] : []),
+    ...(deborahLines.length ? ["أصناف DEBORAH (حصراً من صيدلية الجواد كير، السعر ثابت ومعروف):", ...deborahLines] : []),
     notes ? `ملاحظات: ${notes}` : "",
   ]
     .filter(Boolean)
