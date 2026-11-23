@@ -253,7 +253,7 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
-            {([["home", "🏠"], ["pharmacy", "💊 أدوية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"]] as const).map(([k, label]) => (
+            {([["home", "🏠"], ["pharmacy", "💊 صيدلية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
@@ -265,11 +265,11 @@ export default function ShopHome() {
 
       {step === "browse" && tab === "pharmacy" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <input className={input} placeholder="ابحث عن دواء بالاسم..." value={q} onChange={(e) => onSearch(e.target.value)} />
+          <input className={input} placeholder="ابحث في الصيدلية بالاسم..." value={q} onChange={(e) => onSearch(e.target.value)} />
           {searching && <p className="text-center text-sm text-slate-500">جارٍ البحث...</p>}
           {!searching && q.trim().length >= 2 && results.length === 0 && (
             <p className="rounded-2xl bg-white p-4 text-center text-sm text-slate-600">
-              لم نجده في الأدوية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-[#9e5f69] underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
+              لم نجده في الصيدلية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-[#9e5f69] underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
             </p>
           )}
           {q.trim().length < 2 && (
@@ -302,7 +302,7 @@ export default function ShopHome() {
           {q.trim().length < 2 && dnext !== null && drugs && drugs.length > 0 && (
             <button className={`${btn} w-full bg-white text-slate-700`} disabled={dloading} onClick={() => loadDrugs(letter, dnext)}>{dloading ? "..." : "عرض المزيد"}</button>
           )}
-          <p className="pt-2 text-center text-xs text-slate-500">سعر أدوية الصيدلية تؤكده الصيدلية قبل التوصيل. لا يقدّم التطبيق استشارة طبية.</p>
+          <p className="pt-2 text-center text-xs text-slate-500">سعر أصناف الصيدلية تؤكده الصيدلية قبل التوصيل. لا يقدّم التطبيق استشارة طبية.</p>
         </main>
       )}
 
@@ -365,7 +365,7 @@ export default function ShopHome() {
           ))}
           <div className="grid grid-cols-2 gap-3">
             {([
-              ["pharmacy", "💊", "الأدوية", "ابحث بالاسم"],
+              ["pharmacy", "💊", "الصيدلية", "ابحث بالاسم"],
               ["cosmetics", "🧴", "كوزماتيك", "بشرة، شعر، أطفال..."],
               ["lattafa", "✨", "عطور لطافة", "بالأسعار"],
               ["album", "🖼️", "الألبوم", "اسأل عن أي صورة"],
