@@ -310,5 +310,45 @@
 "price": 8,
 "listPrice": 7.7,
 "image": "/deborah/d39.jpg"
+},
+{
+"id": "d40",
+"name": "24ORE CREAMY BLUSH",
+"cat": "face",
+"price": 17,
+"listPrice": 16.75,
+"image": "/deborah/d40.jpg"
+},
+{
+"id": "d41",
+"name": "IL ROSSETTO LIPSTICK (COLOR EDITION)",
+"cat": "lips",
+"price": 13,
+"listPrice": 13.33,
+"image": "/deborah/d41.jpg"
+},
+{
+"id": "d42",
+"name": "24ORE WATERPROOF LIQUID EYELINER",
+"cat": "eyes",
+"price": 13,
+"listPrice": 13.35,
+"image": "/deborah/d42.jpg"
+},
+{
+"id": "d43",
+"name": "EXTRA BLUSH STICK",
+"cat": "face",
+"price": 17,
+"listPrice": 16.75,
+"image": "/deborah/d43.jpg"
+},
+{
+"id": "d44",
+"name": "POWDER BLUSH MOSAIC",
+"cat": "face",
+"price": 17,
+"listPrice": 16.75,
+"image": "/deborah/d44.jpg"
 }
 ]
