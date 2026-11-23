@@ -64,11 +64,10 @@ export default function ShopLogin() {
   }
 
   return (
-    <main className="flex flex-1 flex-col justify-center gap-6 p-6">
+    <main className="flex flex-1 flex-col justify-center gap-5 p-4">
       <div className="text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/logo.jpg" alt="Carelink — Beauty · Care · Confidence" className="mx-auto mb-2 w-56 rounded-3xl" />
-        <p className="mt-1 text-sm text-slate-600">اطلب من الصيدليات الشريكة وتوصيل إلى بيتك</p>
+        <img src="/brand/promo-delivery.jpg" alt="Carelink — طلبك يوصل إلى باب بيتك: منتجات العناية والجمال والمكملات ومستلزمات الأطفال" className="mx-auto w-full rounded-3xl border-2 border-ink shadow-pop-sm" />
       </div>
 
       {!waiting ? (
