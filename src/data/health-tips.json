@@ -3,180 +3,270 @@
 "t": "الملح والضغط",
 "x": "تنصح منظمة الصحة العالمية البالغين بألّا يتجاوزوا 5 غرامات ملح يومياً (أقل من ملعقة صغيرة). تقليل الملح من أسهل الطرق لخفض ضغط الدم وحماية القلب. انتبه للملح المخفي في الخبز والأجبان والمعلبات والمخللات.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/salt-reduction"
+"u": "https://www.who.int/news-room/fact-sheets/detail/salt-reduction",
+"te": "Salt and blood pressure",
+"xe": "The WHO advises adults to eat less than 5 g of salt a day (under one teaspoon). Cutting salt is one of the easiest ways to lower blood pressure and protect the heart. Watch for hidden salt in bread, cheese, canned food and pickles.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "تحرّك 150 دقيقة",
 "x": "يحتاج البالغ إلى 150 دقيقة على الأقل أسبوعياً من نشاط بدني معتدل، مثل المشي السريع، أي نحو 30 دقيقة في 5 أيام. أي حركة أفضل من لا شيء، وحتى الدقائق القليلة تُحسب.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+"u": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+"te": "Move 150 minutes",
+"xe": "Adults need at least 150 minutes a week of moderate activity such as brisk walking — about 30 minutes on 5 days. Any movement is better than none, and even a few minutes count.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "المضادات الحيوية لا تعالج الرشح",
 "x": "المضادات الحيوية لا تفيد ضد الفيروسات مثل الرشح والإنفلونزا. استعمالها بلا داعٍ يزيد مقاومة البكتيريا لها. خذها فقط بوصفة طبيب، وأكمل المدة كما وُصفت، ولا تعطِ أدويتك لغيرك.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance"
+"u": "https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance",
+"te": "Antibiotics don't treat colds",
+"xe": "Antibiotics do not work against viruses like colds and flu. Using them without need increases bacterial resistance. Take them only with a doctor's prescription, finish the course as prescribed, and never share your medicines.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "اغسل يديك 20 ثانية",
 "x": "غسل اليدين بالماء والصابون لمدة 20 ثانية على الأقل من أبسط الطرق للوقاية من الإسهال والتهابات الجهاز التنفسي. اغسلها قبل الأكل وتحضير الطعام، وبعد الحمام، وبعد العطس أو السعال.",
 "s": "المراكز الأمريكية لمكافحة الأمراض CDC",
-"u": "https://www.cdc.gov/"
+"u": "https://www.cdc.gov/",
+"te": "Wash hands for 20 seconds",
+"xe": "Washing hands with soap and water for at least 20 seconds is one of the simplest ways to prevent diarrhoea and respiratory infections. Wash before eating and cooking, after the toilet, and after sneezing or coughing.",
+"se": "US CDC"
 },
 {
 "t": "واقي الشمس كل يوم",
 "x": "استعمل واقياً من الشمس بعامل حماية SPF 30 أو أكثر وواسع الطيف، حتى في الأيام الغائمة. ضعه قبل الخروج بربع ساعة، وجدّده كل ساعتين وبعد السباحة أو التعرّق.",
 "s": "الأكاديمية الأمريكية للأمراض الجلدية AAD",
-"u": "https://www.aad.org/public"
+"u": "https://www.aad.org/public",
+"te": "Sunscreen every day",
+"xe": "Use a broad-spectrum sunscreen with SPF 30 or higher, even on cloudy days. Apply it 15 minutes before going out and reapply every two hours and after swimming or sweating.",
+"se": "American Academy of Dermatology"
 },
 {
 "t": "السكر المضاف",
 "x": "توصي منظمة الصحة العالمية بأن يقل السكر المضاف عن 10% من السعرات اليومية، والأفضل أقل من 5% (نحو 6 ملاعق صغيرة). المشروبات الغازية والعصائر المحلّاة أكبر مصدر له.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+"u": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+"te": "Added sugar",
+"xe": "The WHO recommends keeping free sugars below 10% of daily calories, ideally below 5% (about 6 teaspoons). Soft drinks and sweetened juices are the biggest source.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "5 حصص خضار وفاكهة",
 "x": "تناول 400 غرام على الأقل يومياً من الخضار والفاكهة، أي نحو 5 حصص، يقلّل خطر أمراض القلب والسكري وبعض أنواع السرطان. نوّع الألوان في طبقك.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+"u": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+"te": "5 portions of fruit and veg",
+"xe": "Eating at least 400 g of fruit and vegetables a day (about 5 portions) lowers the risk of heart disease, diabetes and some cancers. Add different colours to your plate.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "قِس ضغطك",
 "x": "كثيرون مصابون بارتفاع ضغط الدم ولا يعرفون، لأنه غالباً بلا أعراض. قِس ضغطك مرة في السنة على الأقل، وأكثر إن كان عندك سكري أو تاريخ عائلي. القراءة 140/90 أو أكثر في أكثر من قياس تحتاج مراجعة الطبيب.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/hypertension"
+"u": "https://www.who.int/news-room/fact-sheets/detail/hypertension",
+"te": "Check your blood pressure",
+"xe": "Many people have high blood pressure without knowing it, because it usually has no symptoms. Check it at least once a year, more often if you have diabetes or a family history. Readings of 140/90 or more on repeated checks need a doctor.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "النوم الكافي",
 "x": "يحتاج البالغ عادةً إلى 7 ساعات نوم أو أكثر كل ليلة. قلّة النوم المزمنة ترتبط بزيادة الوزن وارتفاع الضغط وضعف المناعة. ثبّت موعد نومك وابتعد عن الشاشات قبل النوم بساعة.",
 "s": "المراكز الأمريكية لمكافحة الأمراض CDC",
-"u": "https://www.cdc.gov/"
+"u": "https://www.cdc.gov/",
+"te": "Enough sleep",
+"xe": "Adults usually need 7 hours of sleep or more each night. Chronic lack of sleep is linked to weight gain, high blood pressure and weaker immunity. Keep a regular bedtime and avoid screens an hour before sleep.",
+"se": "US CDC"
 },
 {
 "t": "الباراسيتامول بأمان",
 "x": "الباراسيتامول آمن بالجرعة الصحيحة، لكن تجاوزها قد يؤذي الكبد بشدة. انتبه لأن أدوية الرشح المركّبة كثيراً ما تحتوي عليه أيضاً، فلا تأخذ دواءين فيهما المادة نفسها. اقرأ النشرة واسأل الصيدلي.",
 "s": "هيئة الخدمات الصحية البريطانية NHS",
-"u": "https://www.nhs.uk/medicines/paracetamol-for-adults/"
+"u": "https://www.nhs.uk/medicines/paracetamol-for-adults/",
+"te": "Paracetamol safely",
+"xe": "Paracetamol is safe at the right dose, but too much can seriously harm the liver. Many combined cold remedies also contain it, so don't take two medicines with the same ingredient. Read the leaflet and ask the pharmacist.",
+"se": "UK NHS"
 },
 {
 "t": "الرضاعة الطبيعية",
 "x": "توصي منظمة الصحة العالمية بالرضاعة الطبيعية وحدها في أول 6 أشهر، ثم إدخال الطعام مع الاستمرار بالرضاعة حتى عمر سنتين أو أكثر. حليب الأم يحمي الطفل من الالتهابات.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/health-topics/breastfeeding"
+"u": "https://www.who.int/health-topics/breastfeeding",
+"te": "Breastfeeding",
+"xe": "The WHO recommends exclusive breastfeeding for the first 6 months, then adding foods while continuing to breastfeed up to 2 years or beyond. Breast milk protects the baby from infections.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "اشرب الماء",
 "x": "الماء أفضل مشروب لترطيب الجسم، وهو بلا سعرات. زِد شربه في الحر وعند الرياضة والحمى. لون البول الفاتح علامة جيدة على أن جسمك يحصل على كفايته.",
 "s": "هيئة الخدمات الصحية البريطانية NHS",
-"u": "https://www.nhs.uk/live-well/"
+"u": "https://www.nhs.uk/live-well/",
+"te": "Drink water",
+"xe": "Water is the best drink to stay hydrated, with zero calories. Drink more in hot weather, during exercise and with fever. Pale urine is a good sign you are getting enough.",
+"se": "UK NHS"
 },
 {
 "t": "التدخين والقلب",
 "x": "التوقف عن التدخين يفيد في أي عمر: بعد سنة واحدة ينخفض خطر أمراض القلب بشكل كبير. الأرجيلة ليست بديلاً آمناً. اسأل الصيدلي عن بدائل النيكوتين التي تساعد على الإقلاع.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/tobacco"
+"u": "https://www.who.int/news-room/fact-sheets/detail/tobacco",
+"te": "Smoking and the heart",
+"xe": "Quitting smoking helps at any age: after one year the risk of heart disease drops significantly. Shisha is not a safe alternative. Ask the pharmacist about nicotine replacement to help you quit.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "لقاح الإنفلونزا السنوي",
 "x": "يُنصح بلقاح الإنفلونزا كل سنة قبل الشتاء، خاصة لكبار السن والحوامل ومرضى الأمراض المزمنة والعاملين في الصحة. الفيروس يتغيّر، لذلك يتجدّد اللقاح سنوياً.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)"
+"u": "https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)",
+"te": "Yearly flu vaccine",
+"xe": "The flu vaccine is recommended every year before winter, especially for older people, pregnant women, people with chronic illness and health workers. The virus changes, so the vaccine is updated yearly.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "فرشاة الأسنان مرتين",
 "x": "نظّف أسنانك مرتين يومياً بمعجون يحتوي على الفلورايد لمدة دقيقتين، وخفّف السكريات بين الوجبات. غيّر الفرشاة كل 3 أشهر أو عندما تتلف شعيراتها.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/oral-health"
+"u": "https://www.who.int/news-room/fact-sheets/detail/oral-health",
+"te": "Brush twice a day",
+"xe": "Brush your teeth twice a day for two minutes with fluoride toothpaste, and limit sugary snacks between meals. Change your toothbrush every 3 months or when the bristles wear out.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "حفظ الأدوية",
 "x": "احفظ الأدوية في مكان بارد وجاف بعيداً عن الشمس، وليس في الحمام أو السيارة، وبعيداً عن متناول الأطفال. لا تستعمل الدواء بعد انتهاء صلاحيته، وأرجِع القديم إلى الصيدلية للتخلص منه بأمان.",
 "s": "إدارة الغذاء والدواء الأمريكية FDA",
-"u": "https://www.fda.gov/consumers/consumer-updates"
+"u": "https://www.fda.gov/consumers/consumer-updates",
+"te": "Storing medicines",
+"xe": "Keep medicines in a cool, dry place away from sunlight — not in the bathroom or car — and out of children's reach. Don't use expired medicines; return old ones to the pharmacy for safe disposal.",
+"se": "US FDA"
 },
 {
 "t": "علامات الجلطة الدماغية",
 "x": "تذكّر علامات الجلطة: ميلان الوجه، ضعف في الذراع، صعوبة في الكلام. إذا ظهرت أيّ منها اتصل بالإسعاف فوراً، فكل دقيقة تفرق. في لبنان: الصليب الأحمر 140.",
 "s": "هيئة الخدمات الصحية البريطانية NHS",
-"u": "https://www.nhs.uk/conditions/stroke/symptoms/"
+"u": "https://www.nhs.uk/conditions/stroke/symptoms/",
+"te": "Signs of a stroke",
+"xe": "Remember the signs: face drooping, arm weakness, speech difficulty. If any appear, call an ambulance immediately — every minute counts. In Lebanon: Red Cross 140.",
+"se": "UK NHS"
 },
 {
 "t": "السكري: اعرف العلامات",
 "x": "العطش الزائد وكثرة التبول والتعب وفقدان الوزن بلا سبب قد تكون علامات سكري. الوزن الصحي والحركة اليومية يقللان خطر النوع الثاني كثيراً. افحص السكر إن كان عندك تاريخ عائلي.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/diabetes"
+"u": "https://www.who.int/news-room/fact-sheets/detail/diabetes",
+"te": "Diabetes: know the signs",
+"xe": "Excessive thirst, frequent urination, tiredness and unexplained weight loss may be signs of diabetes. A healthy weight and daily movement greatly lower the risk of type 2. Get tested if it runs in your family.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "الحديد وفقر الدم",
 "x": "فقر الدم بسبب نقص الحديد شائع عند النساء والأطفال، ومن علاماته التعب والشحوب. اللحوم الحمراء والعدس والسبانخ مصادر جيدة للحديد، والفيتامين C (مثل الحمضيات) يساعد على امتصاصه.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/anaemia"
+"u": "https://www.who.int/news-room/fact-sheets/detail/anaemia",
+"te": "Iron and anaemia",
+"xe": "Iron-deficiency anaemia is common in women and children; tiredness and paleness are signs. Red meat, lentils and spinach are good iron sources, and vitamin C (like citrus) helps absorption.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "الصحة النفسية مهمة",
 "x": "الشعور بالحزن المستمر أو فقدان الاهتمام لأكثر من أسبوعين قد يكون علامة اكتئاب، وهو قابل للعلاج. تحدّث مع شخص تثق به أو مع مختص، وطلب المساعدة علامة قوة.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/depression"
+"u": "https://www.who.int/news-room/fact-sheets/detail/depression",
+"te": "Mental health matters",
+"xe": "Persistent sadness or loss of interest for more than two weeks may be a sign of depression, which is treatable. Talk to someone you trust or a professional — asking for help is a sign of strength.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "سلامة الطعام",
 "x": "خمس قواعد لطعام آمن: النظافة، فصل النيء عن المطبوخ، الطهو الجيد، حفظ الطعام في حرارة آمنة، واستعمال ماء ومكونات سليمة. لا تترك الطعام المطبوخ خارج البراد أكثر من ساعتين.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/food-safety"
+"u": "https://www.who.int/news-room/fact-sheets/detail/food-safety",
+"te": "Food safety",
+"xe": "Five keys to safer food: keep clean, separate raw and cooked, cook thoroughly, keep food at safe temperatures, and use safe water and ingredients. Don't leave cooked food out of the fridge for more than two hours.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "حرارة الطفل",
 "x": "الحرارة عادةً دفاع طبيعي للجسم. راجِع الطبيب فوراً إذا كان الرضيع دون 3 أشهر وحرارته 38 أو أكثر، أو إذا رافقها خمول شديد أو طفح لا يختفي بالضغط أو صعوبة في التنفس. أعطِ خافض الحرارة حسب الوزن كما في النشرة.",
 "s": "هيئة الخدمات الصحية البريطانية NHS",
-"u": "https://www.nhs.uk/conditions/fever-in-children/"
+"u": "https://www.nhs.uk/conditions/fever-in-children/",
+"te": "Fever in children",
+"xe": "Fever is usually the body's natural defence. See a doctor urgently if a baby under 3 months has a temperature of 38°C or more, or if fever comes with severe drowsiness, a rash that doesn't fade when pressed, or difficulty breathing. Give fever medicine by weight as on the leaflet.",
+"se": "UK NHS"
 },
 {
 "t": "الوزن الصحي",
 "x": "زيادة الوزن ترفع خطر السكري وأمراض القلب والمفاصل. فقدان 5 إلى 10% فقط من الوزن يحسّن الضغط والسكر بشكل واضح. ركّز على تغييرات صغيرة تدوم بدل الحميات القاسية.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"
+"u": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+"te": "Healthy weight",
+"xe": "Excess weight raises the risk of diabetes, heart disease and joint problems. Losing just 5–10% of body weight clearly improves blood pressure and sugar. Focus on small changes that last rather than strict diets.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "الكالسيوم وفيتامين د",
 "x": "العظام تحتاج الكالسيوم (الحليب، اللبن، الأجبان، السمسم) وفيتامين د الذي يصنعه الجلد من الشمس. المشي وتمارين الحمل تقوّي العظام. اسأل طبيبك عن فحص فيتامين د إن كنت قليل التعرض للشمس.",
 "s": "هيئة الخدمات الصحية البريطانية NHS",
-"u": "https://www.nhs.uk/conditions/vitamins-and-minerals/vitamin-d/"
+"u": "https://www.nhs.uk/conditions/vitamins-and-minerals/vitamin-d/",
+"te": "Calcium and vitamin D",
+"xe": "Bones need calcium (milk, yoghurt, cheese, sesame) and vitamin D, which the skin makes from sunlight. Walking and weight-bearing exercise strengthen bones. Ask your doctor about a vitamin D test if you get little sun.",
+"se": "UK NHS"
 },
 {
 "t": "الدواء مع العصير",
 "x": "بعض الأدوية تتأثر بعصير الليمون الهندي (الجريب فروت)، ومنها أدوية للكوليسترول والضغط. اقرأ النشرة واسأل الصيدلي عن الطعام والمشروبات التي يجب تجنبها مع دوائك.",
 "s": "إدارة الغذاء والدواء الأمريكية FDA",
-"u": "https://www.fda.gov/consumers/consumer-updates"
+"u": "https://www.fda.gov/consumers/consumer-updates",
+"te": "Medicines and juice",
+"xe": "Some medicines interact with grapefruit juice, including some cholesterol and blood-pressure drugs. Read the leaflet and ask the pharmacist which foods and drinks to avoid with your medicine.",
+"se": "US FDA"
 },
 {
 "t": "ترطيب البشرة",
 "x": "ضع المرطّب بعد الاستحمام مباشرة والبشرة ما زالت رطبة، فهذا يحبس الماء فيها. استعمل ماءً فاتراً لا ساخناً، واختر منتجات بلا عطور إذا كانت بشرتك حساسة.",
 "s": "الأكاديمية الأمريكية للأمراض الجلدية AAD",
-"u": "https://www.aad.org/public"
+"u": "https://www.aad.org/public",
+"te": "Moisturise your skin",
+"xe": "Apply moisturiser right after bathing while the skin is still damp — it locks in water. Use lukewarm, not hot, water and choose fragrance-free products if your skin is sensitive.",
+"se": "American Academy of Dermatology"
 },
 {
 "t": "الحصبة واللقاح",
 "x": "الحصبة مرض شديد العدوى وقد يسبّب مضاعفات خطيرة عند الأطفال. اللقاح بجرعتين آمن وفعّال جداً. تأكّد من أن لقاحات أطفالك مكتملة حسب الجدول الوطني.",
 "s": "منظمة الصحة العالمية",
-"u": "https://www.who.int/news-room/fact-sheets/detail/measles"
+"u": "https://www.who.int/news-room/fact-sheets/detail/measles",
+"te": "Measles and vaccination",
+"xe": "Measles is highly contagious and can cause serious complications in children. The two-dose vaccine is very safe and effective. Make sure your children's vaccines are up to date with the national schedule.",
+"se": "World Health Organization (WHO)"
 },
 {
 "t": "العينان والشاشات",
 "x": "عند العمل على الشاشة طبّق قاعدة 20-20-20: كل 20 دقيقة انظر إلى شيء على بعد 20 قدماً (6 أمتار) لمدة 20 ثانية. ورمش أكثر، فهذا يخفف جفاف العين وتعبها.",
 "s": "الأكاديمية الأمريكية لطب العيون AAO",
-"u": "https://www.aao.org/eye-health"
+"u": "https://www.aao.org/eye-health",
+"te": "Eyes and screens",
+"xe": "When working on a screen, follow the 20-20-20 rule: every 20 minutes look at something 20 feet (6 m) away for 20 seconds. Blink more — it eases dry, tired eyes.",
+"se": "American Academy of Ophthalmology"
 },
 {
 "t": "الكوليسترول",
 "x": "ارتفاع الكوليسترول لا يسبّب أعراضاً، لذلك يُكتشف بفحص الدم. قلّل الدهون المشبعة (الدهون الحيوانية والمقالي)، وأكثِر من الألياف والخضار والسمك، وتحرّك يومياً.",
 "s": "المراكز الأمريكية لمكافحة الأمراض CDC",
-"u": "https://www.cdc.gov/"
+"u": "https://www.cdc.gov/",
+"te": "Cholesterol",
+"xe": "High cholesterol has no symptoms, so it is found by a blood test. Reduce saturated fat (animal fat and fried food), eat more fibre, vegetables and fish, and move every day.",
+"se": "US CDC"
 },
 {
 "t": "اسأل الصيدلي",
 "x": "قبل أخذ أي دواء جديد، حتى دون وصفة أو عشبي، أخبر الصيدلي بكل الأدوية التي تأخذها، وإن كنتِ حاملاً أو مرضعاً. بعض التداخلات بين الأدوية قد تكون خطيرة.",
 "s": "إدارة الغذاء والدواء الأمريكية FDA",
-"u": "https://www.fda.gov/consumers/consumer-updates"
+"u": "https://www.fda.gov/consumers/consumer-updates",
+"te": "Ask your pharmacist",
+"xe": "Before taking any new medicine — even over-the-counter or herbal — tell the pharmacist all the medicines you take, and whether you are pregnant or breastfeeding. Some drug interactions can be dangerous.",
+"se": "US FDA"
 }
 ]

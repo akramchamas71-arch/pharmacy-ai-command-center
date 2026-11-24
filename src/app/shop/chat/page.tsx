@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { btn, resizeImage, shopFetch } from "../api";
+import { useLang } from "../i18n";
 
 interface Msg { id: string; fromCustomer: boolean; text: string; at: string }
 
@@ -12,6 +13,7 @@ export default function ShopChat() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
+  const { t: tr } = useLang();
 
   const load = useCallback(async () => {
     try {
@@ -37,7 +39,7 @@ export default function ShopChat() {
       setText("");
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "خطأ");
+      setError(e instanceof Error ? e.message : tr("خطأ", "Error"));
     } finally {
       setBusy(false);
     }
@@ -46,13 +48,13 @@ export default function ShopChat() {
   return (
     <>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b-2 border-ink bg-[#9e5f69] px-4 py-3 text-white">
-        <Link href="/shop" className="rounded-full border-2 border-white px-3 py-1.5 text-sm font-bold">→ المتجر</Link>
-        <p className="font-display text-lg font-extrabold">طلباتي ومحادثتي</p>
+        <Link href="/shop" className="rounded-full border-2 border-white px-3 py-1.5 text-sm font-bold">{tr("→ المتجر", "← Shop")}</Link>
+        <p className="font-display text-lg font-extrabold">{tr("طلباتي ومحادثتي", "My orders & chat")}</p>
       </header>
 
       <main className="flex-1 space-y-2 overflow-y-auto p-4 pb-32">
-        {messages === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
-        {messages?.length === 0 && <p className="text-center text-sm text-slate-500">لا توجد طلبات بعد. اطلب من المتجر أو اكتب لنا هنا.</p>}
+        {messages === null && <p className="text-center text-sm text-slate-500">{tr("جارٍ التحميل...", "Loading...")}</p>}
+        {messages?.length === 0 && <p className="text-center text-sm text-slate-500">{tr("لا توجد طلبات بعد. اطلب من المتجر أو اكتب لنا هنا.", "No orders yet. Order from the shop or write to us here.")}</p>}
         {messages?.map((m) => (
           <div key={m.id} className={`flex ${m.fromCustomer ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[85%] rounded-3xl border-2 border-ink px-4 py-2.5 text-sm shadow-[0_2px_0_#1d2b4f] ${m.fromCustomer ? "bg-white" : "bg-[#9e5f69] text-white"}`}>
@@ -63,14 +65,14 @@ export default function ShopChat() {
             </div>
           </div>
         ))}
-        {busy && <p className="text-center text-xs text-slate-500">جارٍ الإرسال...</p>}
+        {busy && <p className="text-center text-xs text-slate-500">{tr("جارٍ الإرسال...", "Sending...")}</p>}
         <div ref={bottom} />
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t-2 border-ink bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         {error && <p className="mb-2 text-center text-xs font-bold text-red-700">{error}</p>}
         <div className="flex items-end gap-2">
-          <label className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl border-2 border-ink text-xl" title="أرفق صورة وصفة">
+          <label className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl border-2 border-ink text-xl" title={tr("أرفق صورة وصفة", "Attach a prescription photo")}>
             📎
             <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
               const f = e.target.files?.[0];
@@ -78,8 +80,8 @@ export default function ShopChat() {
               e.target.value = "";
             }} />
           </label>
-          <textarea rows={1} className="min-h-12 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-3 text-base focus:border-ink focus:outline-none" placeholder="اكتب رسالتك..." value={text} onChange={(e) => setText(e.target.value)} />
-          <button className={`${btn} shrink-0 bg-[#9e5f69] px-4 text-white`} disabled={busy || !text.trim()} onClick={() => send()}>إرسال</button>
+          <textarea rows={1} className="min-h-12 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-3 text-base focus:border-ink focus:outline-none" placeholder={tr("اكتب رسالتك...", "Write your message...")} value={text} onChange={(e) => setText(e.target.value)} />
+          <button className={`${btn} shrink-0 bg-[#9e5f69] px-4 text-white`} disabled={busy || !text.trim()} onClick={() => send()}>{tr("إرسال", "Send")}</button>
         </div>
       </div>
     </>

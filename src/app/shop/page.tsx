@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { btn, input, resizeImage, shopFetch } from "./api";
+import { LangToggle, useLang } from "./i18n";
 import album from "@/data/album.json";
 import tips from "@/data/health-tips.json";
 
-interface Tip { t: string; x: string; s: string; u: string }
+interface Tip { t: string; x: string; s: string; u: string; te?: string; xe?: string; se?: string }
 const TIPS = tips as Tip[];
 /** Index of today's tip (Beirut date), one tip per day, cycling. */
 function tipIndex(offset = 0) {
@@ -36,6 +37,9 @@ const usd = (n: number) => `${Math.round(n)}$`;
 
 export default function ShopHome() {
   const router = useRouter();
+  const { t, lang } = useLang();
+  const COS_EN: Record<string, string> = { skin: "🧴 Skin care", makeup: "💄 Makeup", perfume: "🌸 Fragrance & deo", hair: "💇 Hair", baby: "👶 Baby & milk", body: "🛁 Personal care", dental: "🦷 Dental", devices: "🩺 Devices & supplies", food: "🥣 Food" };
+  const DEB_EN: Record<string, string> = { face: "Face", eyes: "Eyes", lips: "Lips", nails: "Nails" };
   const [me, setMe] = useState<Me | null>(null);
   const [tab, setTab] = useState<"home" | "consult" | "tips" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album">("home");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
@@ -68,7 +72,7 @@ export default function ShopHome() {
       setCImage(null);
       router.push("/shop/chat");
     } catch (e) {
-      setCErr(e instanceof Error ? e.message : "تعذّر الإرسال");
+      setCErr(e instanceof Error ? e.message : t("تعذّر الإرسال", "Could not send"));
       setCBusy(false);
     }
   }
@@ -80,7 +84,7 @@ export default function ShopHome() {
   async function askAboutPhoto(p: AlbumItem) {
     setAsking(true);
     try {
-      await shopFetch("/api/shop/message", { body: { text: `[استفسار من الألبوم] ${p.title}\nأريد معرفة السعر والتوفر لما في هذه الصورة.\n(الصورة: ${p.image})` } });
+      await shopFetch("/api/shop/message", { body: { text: `[استفسار من الألبوم] ${p.title}\n${t("أريد معرفة السعر والتوفر لما في هذه الصورة.", "I would like to know the price and availability of the products in this picture.")}\n(الصورة: ${p.image})` } });
       router.push("/shop/chat");
     } catch {
       setAsking(false);
@@ -258,7 +262,7 @@ export default function ShopHome() {
       setCart([]);
       router.push("/shop/chat");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "خطأ");
+      setError(e instanceof Error ? e.message : t("خطأ", "Error"));
     } finally {
       setBusy(false);
     }
@@ -276,14 +280,14 @@ export default function ShopHome() {
             <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded-xl border-2 border-white/70" />
             <div>
             <p className="font-display text-xl font-extrabold">Carelink</p>
-            <p className="text-[11px] opacity-90">{me ? `أهلاً ${me.name ?? ""}` : "..."}</p>
+            <p className="text-[11px] opacity-90">{me ? `${t("أهلاً", "Hello")} ${me.name ?? ""}` : "..."}</p>
             </div>
           </div>
-          <Link href="/shop/chat" className="rounded-full border-2 border-white px-3 py-1.5 text-sm font-bold">طلباتي 💬</Link>
+          <div className="flex items-center gap-2"><LangToggle /><Link href="/shop/chat" className="rounded-full border-2 border-white px-3 py-1.5 text-sm font-bold">{t("طلباتي", "My orders")} 💬</Link></div>
         </div>
         {step === "browse" && (
           <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
-            {([["home", "🏠"], ["consult", "🩺 استشارة"], ["tips", "💡 معلومة اليوم"], ["pharmacy", "💊 صيدلية"], ["cosmetics", "🧴 كوزماتيك"], ["lattafa", "✨ لطافة"], ["deborah", "💄 Deborah"], ["album", "🖼️ ألبوم"]] as const).map(([k, label]) => (
+            {([["home", "🏠"], ["consult", t("🩺 استشارة", "🩺 Ask")], ["tips", t("💡 معلومة اليوم", "💡 Daily tip")], ["pharmacy", t("💊 صيدلية", "💊 Pharmacy")], ["cosmetics", t("🧴 كوزماتيك", "🧴 Cosmetics")], ["lattafa", t("✨ لطافة", "✨ Lattafa")], ["deborah", "💄 Deborah"], ["album", t("🖼️ ألبوم", "🖼️ Gallery")]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
@@ -295,21 +299,21 @@ export default function ShopHome() {
 
       {step === "browse" && tab === "pharmacy" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <input className={input} placeholder="ابحث في الصيدلية بالاسم..." value={q} onChange={(e) => onSearch(e.target.value)} />
-          {searching && <p className="text-center text-sm text-slate-500">جارٍ البحث...</p>}
+          <input className={input} placeholder={t("ابحث في الصيدلية بالاسم...", "Search the pharmacy by name...")} value={q} onChange={(e) => onSearch(e.target.value)} />
+          {searching && <p className="text-center text-sm text-slate-500">{t("جارٍ البحث...", "Searching...")}</p>}
           {!searching && q.trim().length >= 2 && results.length === 0 && (
             <p className="rounded-2xl bg-white p-4 text-center text-sm text-slate-600">
-              لم نجده في الصيدلية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو <Link href="/shop/chat" className="font-bold text-[#9e5f69] underline">اكتب لنا اسمه</Link> ونبحث لك عنه.
+              {t("لم نجده في الصيدلية. للكريمات والعناية جرّب تبويب «كوزماتيك»، أو", "Not found in the pharmacy. For creams and care try the «Cosmetics» tab, or")} <Link href="/shop/chat" className="font-bold text-[#9e5f69] underline">{t("اكتب لنا اسمه", "write us its name")}</Link> {t("ونبحث لك عنه.", "and we will look for it.")}
             </p>
           )}
           {q.trim().length < 2 && (
             <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1" dir="ltr">
               {["", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((l) => (
-                <button key={l || "all"} className={`${chip(letter === l)} px-2.5`} onClick={() => { setLetter(l); setDrugs(null); loadDrugs(l, 0); }}>{l || "الكل"}</button>
+                <button key={l || "all"} className={`${chip(letter === l)} px-2.5`} onClick={() => { setLetter(l); setDrugs(null); loadDrugs(l, 0); }}>{l || t("الكل", "All")}</button>
               ))}
             </div>
           )}
-          {q.trim().length < 2 && drugs === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
+          {q.trim().length < 2 && drugs === null && <p className="text-center text-sm text-slate-500">{t("جارٍ التحميل...", "Loading...")}</p>}
           <ul className="space-y-2">
             {(q.trim().length >= 2 ? results : drugs ?? []).map((p) => (
               <li key={p.id} className="flex items-center justify-between gap-3 rounded-2xl border-2 border-slate-200 bg-white p-3">
@@ -317,37 +321,37 @@ export default function ShopHome() {
                   <p className="truncate font-bold text-slate-900" dir="auto">{p.name}</p>
                   <p className="text-xs text-slate-500">
                     {p.brand ? `${p.brand} · ` : ""}
-                    {p.available ? <span className="text-[#9e5f69]">متوفر</span> : <span className="text-amber-700">نتحقق من توفره</span>}
-                    {RX(p.type) && <span className="mr-1 rounded-full bg-amber-100 px-2 text-amber-800">بوصفة</span>}
+                    {p.available ? <span className="text-[#9e5f69]">{t("متوفر", "Available")}</span> : <span className="text-amber-700">{t("نتحقق من توفره", "Checking availability")}</span>}
+                    {RX(p.type) && <span className="mr-1 rounded-full bg-amber-100 px-2 text-amber-800">{t("بوصفة", "Rx")}</span>}
                   </p>
                 </div>
                 {CTRL(p.type) ? (
-                  <span className="shrink-0 text-xs text-slate-500">حضورياً فقط</span>
+                  <span className="shrink-0 text-xs text-slate-500">{t("حضورياً فقط", "In store only")}</span>
                 ) : (
-                  <button className={`${btn} shrink-0 bg-sun px-3 py-2 text-sm text-ink`} onClick={() => addLine({ kind: "pharmacy", key: `p-${p.id}`, product: p, qty: 1 })}>+ أضف</button>
+                  <button className={`${btn} shrink-0 bg-sun px-3 py-2 text-sm text-ink`} onClick={() => addLine({ kind: "pharmacy", key: `p-${p.id}`, product: p, qty: 1 })}>{t("+ أضف", "+ Add")}</button>
                 )}
               </li>
             ))}
           </ul>
           {q.trim().length < 2 && dnext !== null && drugs && drugs.length > 0 && (
-            <button className={`${btn} w-full bg-white text-slate-700`} disabled={dloading} onClick={() => loadDrugs(letter, dnext)}>{dloading ? "..." : "عرض المزيد"}</button>
+            <button className={`${btn} w-full bg-white text-slate-700`} disabled={dloading} onClick={() => loadDrugs(letter, dnext)}>{dloading ? "..." : t("عرض المزيد", "Show more")}</button>
           )}
-          <p className="pt-2 text-center text-xs text-slate-500">سعر أصناف الصيدلية تؤكده الصيدلية قبل التوصيل. لا يقدّم التطبيق استشارة طبية.</p>
+          <p className="pt-2 text-center text-xs text-slate-500">{t("سعر أصناف الصيدلية تؤكده الصيدلية قبل التوصيل.", "Pharmacy prices are confirmed by the pharmacy before delivery.")}</p>
         </main>
       )}
 
       {step === "browse" && tab === "cosmetics" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <input className={input} placeholder="ابحث: Avene، La Roche، شامبو، SPF..." value={cq} onChange={(e) => onCosmeticSearch(e.target.value)} />
+          <input className={input} placeholder={t("ابحث: Avene، La Roche، شامبو، SPF...", "Search: Avene, La Roche, shampoo, SPF...")} value={cq} onChange={(e) => onCosmeticSearch(e.target.value)} />
           {cq.trim().length < 2 && (
             <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
               {cats.map((c) => (
-                <button key={c.key} className={chip(cat === c.key)} onClick={() => { setCat(c.key); setCitems(null); loadCosmetics(c.key, "", 0); }}>{c.label}</button>
+                <button key={c.key} className={chip(cat === c.key)} onClick={() => { setCat(c.key); setCitems(null); loadCosmetics(c.key, "", 0); }}>{lang === "en" ? COS_EN[c.key] ?? c.label : c.label}</button>
               ))}
             </div>
           )}
-          {citems === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
-          {citems && citems.length === 0 && !cloading && <p className="text-center text-sm text-slate-500">لا نتائج.</p>}
+          {citems === null && <p className="text-center text-sm text-slate-500">{t("جارٍ التحميل...", "Loading...")}</p>}
+          {citems && citems.length === 0 && !cloading && <p className="text-center text-sm text-slate-500">{t("لا نتائج.", "No results.")}</p>}
           <div className="grid grid-cols-2 gap-3">
             {(citems ?? []).map((i) => (
               <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
@@ -362,7 +366,7 @@ export default function ShopHome() {
                   <div className="mt-auto flex items-center justify-between pt-1">
                     {i.price != null
                       ? <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
-                      : <span className="text-[11px] text-slate-500">السعر عند التأكيد</span>}
+                      : <span className="text-[11px] text-slate-500">{t("السعر عند التأكيد", "Price on confirmation")}</span>}
                     <button className="rounded-xl border-2 border-ink bg-sun px-2.5 py-1 text-sm font-extrabold"
                       onClick={() => addLine({ kind: "pharmacy", key: `p-${i.id}`, product: { id: i.id, name: i.name, brand: null, type: i.type, available: true, price: i.price }, qty: 1 })}>+</button>
                   </div>
@@ -372,9 +376,9 @@ export default function ShopHome() {
           </div>
           {cnext !== null && citems && citems.length > 0 && (
             <button className={`${btn} w-full bg-white text-slate-700`} disabled={cloading}
-              onClick={() => loadCosmetics(cat, cq.trim().length >= 2 ? cq.trim() : "", cnext)}>{cloading ? "..." : "عرض المزيد"}</button>
+              onClick={() => loadCosmetics(cat, cq.trim().length >= 2 ? cq.trim() : "", cnext)}>{cloading ? "..." : t("عرض المزيد", "Show more")}</button>
           )}
-          <p className="pt-2 text-center text-xs text-slate-500">نؤكد السعر والتوفر قبل التوصيل.</p>
+          <p className="pt-2 text-center text-xs text-slate-500">{t("نؤكد السعر والتوفر قبل التوصيل.", "We confirm price and availability before delivery.")}</p>
         </main>
       )}
 
@@ -387,16 +391,16 @@ export default function ShopHome() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/collage.jpg" alt="Carelink — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد" className="w-full" />
           </button>
-          <p className="text-center text-sm font-bold text-slate-700">حدّك وين ما كنت 💗 — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد</p>
+          <p className="text-center text-sm font-bold text-slate-700">{t("حدّك وين ما كنت 💗 — كل ما تحتاجينه للعناية بك وبعائلتك في مكان واحد", "By your side wherever you are 💗 — everything you need to care for you and your family, in one place")}</p>
           <button onClick={() => setTab("tips")} className="block w-full rounded-3xl border-2 border-ink bg-[#f7ecee] p-4 text-right shadow-pop-sm">
-            <p className="text-xs font-bold text-[#9e5f69]">💡 معلومة صحية اليوم</p>
-            <p className="mt-1 font-extrabold">{TIPS[tipIndex()].t}</p>
-            <p className="mt-1 line-clamp-2 text-sm text-slate-700">{TIPS[tipIndex()].x}</p>
+            <p className="text-xs font-bold text-[#9e5f69]">{t("💡 معلومة صحية اليوم", "💡 Today's health tip")}</p>
+            <p className="mt-1 font-extrabold">{lang === "en" ? TIPS[tipIndex()].te : TIPS[tipIndex()].t}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-slate-700">{lang === "en" ? TIPS[tipIndex()].xe : TIPS[tipIndex()].x}</p>
           </button>
           {([
-            ["/brand/banner-skin.jpg", "العناية بالبشرة", () => { setTab("cosmetics"); setCat("skin"); setCitems(null); loadCosmetics("skin", "", 0); }],
-            ["/brand/banner-makeup.jpg", "المكياج — Deborah", () => setTab("deborah")],
-            ["/brand/banner-body.jpg", "العناية بالجسم ومزيلات العرق", () => { setTab("cosmetics"); setCat("body"); setCitems(null); loadCosmetics("body", "", 0); }],
+            ["/brand/banner-skin.jpg", t("العناية بالبشرة", "Skin care"), () => { setTab("cosmetics"); setCat("skin"); setCitems(null); loadCosmetics("skin", "", 0); }],
+            ["/brand/banner-makeup.jpg", t("المكياج — Deborah", "Makeup — Deborah"), () => setTab("deborah")],
+            ["/brand/banner-body.jpg", t("العناية بالجسم ومزيلات العرق", "Body care & deodorants"), () => { setTab("cosmetics"); setCat("body"); setCitems(null); loadCosmetics("body", "", 0); }],
           ] as const).map(([src, label, go]) => (
             <button key={src} onClick={go} className="block w-full overflow-hidden rounded-3xl border-2 border-ink shadow-pop-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -405,15 +409,15 @@ export default function ShopHome() {
           ))}
           <div className="grid grid-cols-2 gap-3">
             {([
-              ["consult", "🩺", "استشارة مجانية", "اسأل عن دواء أو عناية"],
-              ["pharmacy", "💊", "الصيدلية", "ابحث بالاسم"],
-              ["cosmetics", "🧴", "كوزماتيك", "بشرة، شعر، أطفال..."],
-              ["lattafa", "✨", "عطور لطافة", "بالأسعار"],
-              ["album", "🖼️", "الألبوم", "اسأل عن أي صورة"],
-            ] as const).map(([k, icon, t, sub]) => (
+              ["consult", "🩺", t("استشارة مجانية", "Free consultation"), t("اسأل عن دواء أو عناية", "Ask about medicine or care")],
+              ["pharmacy", "💊", t("الصيدلية", "Pharmacy"), t("ابحث بالاسم", "Search by name")],
+              ["cosmetics", "🧴", t("كوزماتيك", "Cosmetics"), t("بشرة، شعر، أطفال...", "Skin, hair, baby...")],
+              ["lattafa", "✨", t("عطور لطافة", "Lattafa perfumes"), t("بالأسعار", "With prices")],
+              ["album", "🖼️", t("الألبوم", "Gallery"), t("اسأل عن أي صورة", "Ask about any photo")],
+            ] as const).map(([k, icon, title, sub]) => (
               <button key={k} onClick={() => setTab(k)} className="rounded-3xl border-2 border-ink bg-white p-4 text-right shadow-pop-sm">
                 <span className="text-2xl">{icon}</span>
-                <p className="mt-1 font-extrabold">{t}</p>
+                <p className="mt-1 font-extrabold">{title}</p>
                 <p className="text-xs text-slate-500">{sub}</p>
               </button>
             ))}
@@ -427,26 +431,26 @@ export default function ShopHome() {
             const tip = TIPS[tipIndex(o)];
             return (
               <div key={o} className={`rounded-3xl border-2 bg-white p-4 ${o === 0 ? "border-ink shadow-pop-sm" : "border-slate-200"}`}>
-                <p className="text-xs font-bold text-[#9e5f69]">{o === 0 ? "💡 معلومة اليوم" : o === 1 ? "أمس" : `قبل ${o} أيام`}</p>
-                <p className={`mt-1 font-extrabold ${o === 0 ? "text-lg" : ""}`}>{tip.t}</p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-700">{tip.x}</p>
-                <a href={tip.u} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-bold text-[#9e5f69] underline">المصدر: {tip.s} ↗</a>
+                <p className="text-xs font-bold text-[#9e5f69]">{o === 0 ? t("💡 معلومة اليوم", "💡 Today's tip") : o === 1 ? t("أمس", "Yesterday") : t(`قبل ${o} أيام`, `${o} days ago`)}</p>
+                <p className={`mt-1 font-extrabold ${o === 0 ? "text-lg" : ""}`}>{lang === "en" ? tip.te : tip.t}</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-700">{lang === "en" ? tip.xe : tip.x}</p>
+                <a href={tip.u} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-bold text-[#9e5f69] underline">{t("المصدر", "Source")}: {lang === "en" ? tip.se ?? tip.s : tip.s} ↗</a>
               </div>
             );
           })}
-          <p className="text-center text-xs text-slate-500">معلومات عامة للتوعية لا تغني عن استشارة الطبيب. عندك سؤال؟ <button className="font-bold text-[#9e5f69] underline" onClick={() => setTab("consult")}>اسألي في الاستشارة المجانية</button></p>
+          <p className="text-center text-xs text-slate-500">{t("معلومات عامة للتوعية لا تغني عن استشارة الطبيب. عندك سؤال؟", "General awareness information, not a substitute for a doctor. Have a question?")} <button className="font-bold text-[#9e5f69] underline" onClick={() => setTab("consult")}>{t("اسألي في الاستشارة المجانية", "Ask in the free consultation")}</button></p>
         </main>
       )}
 
       {step === "browse" && tab === "consult" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
           <div className="rounded-3xl border-2 border-ink bg-white p-4">
-            <p className="text-lg font-extrabold">🩺 استشارة مجانية</p>
-            <p className="mt-1 text-sm text-slate-700">اسألي عن أي دواء أو منتج عناية: طريقة الاستعمال، البديل، الروتين المناسب لبشرتك... يجيبك مساعد Carelink فوراً، وإذا احتاج سؤالك صيدلياً أو طبيباً مختصاً نحوّله لفريقنا ويصلك الرد في «طلباتي» بعد بعض الوقت.</p>
+            <p className="text-lg font-extrabold">{t("🩺 استشارة مجانية", "🩺 Free consultation")}</p>
+            <p className="mt-1 text-sm text-slate-700">{t("اسألي عن أي دواء أو منتج عناية: طريقة الاستعمال، البديل، الروتين المناسب لبشرتك... يجيبك مساعد Carelink فوراً، وإذا احتاج سؤالك صيدلياً أو طبيباً مختصاً نحوّله لفريقنا ويصلك الرد في «طلباتي» بعد بعض الوقت.", "Ask about any medicine or care product: how to use it, alternatives, the right routine for your skin... The Carelink assistant answers right away, and if your question needs a pharmacist or a specialist doctor we refer it to our team and the reply reaches you in «My orders» after some time.")}</p>
           </div>
-          <textarea className={input} rows={5} placeholder="اكتبي سؤالك هنا... (اذكري العمر والأدوية التي تأخذينها إن وُجدت)" value={cText} onChange={(e) => setCText(e.target.value)} />
+          <textarea className={input} rows={5} placeholder={t("اكتبي سؤالك هنا... (اذكري العمر والأدوية التي تأخذينها إن وُجدت)", "Write your question here... (mention age and any medicines you take)")} value={cText} onChange={(e) => setCText(e.target.value)} />
           <label className="flex cursor-pointer items-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-3 text-sm font-bold text-slate-600">
-            📷 {cImage ? "✓ أُرفقت صورة (اضغطي للتغيير)" : "أرفقي صورة (علبة دواء، وصفة، مشكلة بالبشرة) — اختياري"}
+            📷 {cImage ? t("✓ أُرفقت صورة (اضغطي للتغيير)", "✓ Photo attached (tap to change)") : t("أرفقي صورة (علبة دواء، وصفة، مشكلة بالبشرة) — اختياري", "Attach a photo (medicine box, prescription, skin issue) — optional")}
             <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
               const f = e.target.files?.[0];
               if (f) setCImage(await resizeImage(f).catch(() => null));
@@ -454,15 +458,15 @@ export default function ShopHome() {
           </label>
           {cErr && <p className="rounded-2xl border-2 border-red-300 bg-red-50 p-3 text-sm font-bold text-red-700">{cErr}</p>}
           <button className={`${btn} w-full bg-[#9e5f69] text-white`} disabled={cBusy || cText.trim().length < 3} onClick={sendConsult}>
-            {cBusy ? "جارٍ الإرسال..." : "أرسلي الاستشارة"}
+            {cBusy ? t("جارٍ الإرسال...", "Sending...") : t("أرسلي الاستشارة", "Send consultation")}
           </button>
-          <p className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-900">⚠️ المعلومات المقدّمة عامة ولا تغني عن استشارة الطبيب. في الحالات الطارئة (ضيق نفس، ألم في الصدر، نزيف...) توجّهي فوراً إلى أقرب طوارئ أو اتصلي بالصليب الأحمر 140.</p>
+          <p className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-900">⚠️ {t("المعلومات المقدّمة عامة ولا تغني عن استشارة الطبيب. في الحالات الطارئة (ضيق نفس، ألم في الصدر، نزيف...) توجّهي فوراً إلى أقرب طوارئ أو اتصلي بالصليب الأحمر 140.", "Information is general and does not replace a doctor. In an emergency (shortness of breath, chest pain, bleeding...) go to the nearest emergency room or call the Red Cross on 140.")}</p>
         </main>
       )}
 
       {step === "browse" && tab === "album" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <p className="rounded-2xl bg-white p-3 text-center text-sm text-slate-700">اضغطي على أي صورة أو فيديو لتسألي عن منتجاتها وسعرها — نجيبك في «طلباتي».</p>
+          <p className="rounded-2xl bg-white p-3 text-center text-sm text-slate-700">{t("اضغطي على أي صورة أو فيديو لتسألي عن منتجاتها وسعرها — نجيبك في «طلباتي».", "Tap any photo or video to ask about its products and price — we reply in «My orders».")}</p>
           <div className="columns-2 gap-3 [&>*]:mb-3">
             {ALBUM.map((p) => (
               <button key={p.id} onClick={() => setPhoto(p)} className="block w-full break-inside-avoid overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
@@ -485,9 +489,9 @@ export default function ShopHome() {
               <div className="mx-auto w-full max-w-md space-y-2 pt-3" onClick={(e) => e.stopPropagation()}>
                 <p className="text-center text-sm font-bold text-white">{photo.title}</p>
                 <button className={`${btn} w-full bg-sun text-ink`} disabled={asking} onClick={() => askAboutPhoto(photo)}>
-                  {asking ? "جارٍ الإرسال..." : "اسألي عن السعر والتوفر 💬"}
+                  {asking ? t("جارٍ الإرسال...", "Sending...") : t("اسألي عن السعر والتوفر 💬", "Ask about price & availability 💬")}
                 </button>
-                <button className="w-full py-2 text-sm font-bold text-white/80" onClick={() => setPhoto(null)}>إغلاق</button>
+                <button className="w-full py-2 text-sm font-bold text-white/80" onClick={() => setPhoto(null)}>{t("إغلاق", "Close")}</button>
               </div>
             </div>
           )}
@@ -496,14 +500,14 @@ export default function ShopHome() {
 
       {step === "browse" && tab === "deborah" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">DEBORAH MILANO — مستحضرات تجميل إيطالية</p>
+          <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">DEBORAH MILANO — {t("مستحضرات تجميل إيطالية", "Italian makeup")}</p>
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-            <button className={chip(dsel === "ALL")} onClick={() => setDsel("ALL")}>الكل</button>
+            <button className={chip(dsel === "ALL")} onClick={() => setDsel("ALL")}>{t("الكل", "All")}</button>
             {dcat.map((c) => (
-              <button key={c.key} className={chip(dsel === c.key)} onClick={() => setDsel(c.key)}>{c.label}</button>
+              <button key={c.key} className={chip(dsel === c.key)} onClick={() => setDsel(c.key)}>{lang === "en" ? DEB_EN[c.key] ?? c.label : c.label}</button>
             ))}
           </div>
-          {ditems === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
+          {ditems === null && <p className="text-center text-sm text-slate-500">{t("جارٍ التحميل...", "Loading...")}</p>}
           <div className="grid grid-cols-2 gap-3">
             {(ditems ?? []).filter((i) => dsel === "ALL" || i.cat === dsel).map((i) => (
               <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
@@ -522,24 +526,24 @@ export default function ShopHome() {
               </div>
             ))}
           </div>
-          <p className="pt-2 text-center text-xs text-slate-500">الألوان والدرجات حسب المتوفر — اذكر اللون المطلوب في الملاحظات. نؤكد التوفر قبل التوصيل.</p>
+          <p className="pt-2 text-center text-xs text-slate-500">{t("الألوان والدرجات حسب المتوفر — اذكر اللون المطلوب في الملاحظات. نؤكد التوفر قبل التوصيل.", "Colors and shades as available — write the shade you want in the notes. We confirm availability before delivery.")}</p>
         </main>
       )}
 
       {step === "browse" && tab === "lattafa" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <input className={input} placeholder="ابحث عن عطر: Yara، Asad، Khamrah..." value={lq} onChange={(e) => { setLq(e.target.value); setShown(40); }} />
+          <input className={input} placeholder={t("ابحث عن عطر: Yara، Asad، Khamrah...", "Search a perfume: Yara, Asad, Khamrah...")} value={lq} onChange={(e) => { setLq(e.target.value); setShown(40); }} />
           {!lq && (
             <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-              <button className={chip(brand === "NEW")} onClick={() => { setBrand("NEW"); setShown(40); }}>🆕 وصل حديثاً</button>
-              <button className={chip(brand === "ALL")} onClick={() => { setBrand("ALL"); setShown(40); }}>الكل</button>
+              <button className={chip(brand === "NEW")} onClick={() => { setBrand("NEW"); setShown(40); }}>{t("🆕 وصل حديثاً", "🆕 New arrivals")}</button>
+              <button className={chip(brand === "ALL")} onClick={() => { setBrand("ALL"); setShown(40); }}>{t("الكل", "All")}</button>
               {brands.map(([k, label]) => (
                 <button key={k} className={chip(brand === k)} onClick={() => { setBrand(k); setShown(40); }}>{label}</button>
               ))}
             </div>
           )}
-          {catalog === null && <p className="text-center text-sm text-slate-500">جارٍ التحميل...</p>}
-          {catalog && lattafaList.length === 0 && <p className="text-center text-sm text-slate-500">لا نتائج.</p>}
+          {catalog === null && <p className="text-center text-sm text-slate-500">{t("جارٍ التحميل...", "Loading...")}</p>}
+          {catalog && lattafaList.length === 0 && <p className="text-center text-sm text-slate-500">{t("لا نتائج.", "No results.")}</p>}
           <div className="grid grid-cols-2 gap-3">
             {lattafaList.slice(0, shown).map((i) => (
               <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
@@ -550,7 +554,7 @@ export default function ShopHome() {
                     : <span className="text-4xl opacity-40">✨</span>}
                 </div>
                 <div className="flex flex-1 flex-col gap-1 p-2.5">
-                  <p className="text-[11px] font-bold text-[#9e5f69]">{i.brand}{i.isNew ? " · جديد" : ""}</p>
+                  <p className="text-[11px] font-bold text-[#9e5f69]">{i.brand}{i.isNew ? t(" · جديد", " · New") : ""}</p>
                   <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
                   <p className="text-[11px] text-slate-500" dir="ltr">{i.size}</p>
                   <div className="mt-auto flex items-center justify-between pt-1">
@@ -562,15 +566,15 @@ export default function ShopHome() {
             ))}
           </div>
           {lattafaList.length > shown && (
-            <button className={`${btn} w-full bg-white text-slate-700`} onClick={() => setShown((s) => s + 40)}>عرض المزيد ({lattafaList.length - shown})</button>
+            <button className={`${btn} w-full bg-white text-slate-700`} onClick={() => setShown((s) => s + 40)}>{t("عرض المزيد", "Show more")} ({lattafaList.length - shown})</button>
           )}
-          <p className="pt-2 text-center text-xs text-slate-500">الأسعار بالدولار شاملة الضريبة. نؤكد التوفر مع الشركة قبل التوصيل.</p>
+          <p className="pt-2 text-center text-xs text-slate-500">{t("الأسعار بالدولار شاملة الضريبة. نؤكد التوفر مع الشركة قبل التوصيل.", "Prices in USD including VAT. We confirm availability before delivery.")}</p>
         </main>
       )}
 
       {step === "browse" && cart.length > 0 && (
         <section className="mx-4 mb-28 space-y-2 rounded-3xl border-2 border-ink bg-white p-4">
-          <p className="font-extrabold">سلّتك</p>
+          <p className="font-extrabold">{t("سلّتك", "Your cart")}</p>
           {cart.map((l) => (
             <div key={l.key} className="flex items-center justify-between gap-2">
               <p className="min-w-0 truncate text-sm" dir="auto">
@@ -583,34 +587,34 @@ export default function ShopHome() {
               </div>
             </div>
           ))}
-          {deborahTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">مجموع Deborah: {usd(deborahTotal)}</p>}
-          {lattafaTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">مجموع عطور لطافة: {usd(lattafaTotal)}</p>}
+          {deborahTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">{t("مجموع Deborah", "Deborah total")}: {usd(deborahTotal)}</p>}
+          {lattafaTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">{t("مجموع عطور لطافة", "Lattafa total")}: {usd(lattafaTotal)}</p>}
         </section>
       )}
 
       {step === "checkout" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <button className="text-sm font-bold text-slate-600" onClick={() => setStep("browse")}>→ رجوع</button>
-          <label className="block text-sm font-bold">الاسم</label>
+          <button className="text-sm font-bold text-slate-600" onClick={() => setStep("browse")}>{t("→ رجوع", "← Back")}</button>
+          <label className="block text-sm font-bold">{t("الاسم", "Name")}</label>
           <input className={input} value={name} onChange={(e) => setName(e.target.value)} />
-          <label className="block text-sm font-bold">المنطقة</label>
-          <input className={input} placeholder="مثال: بعلبك، زحلة، الضاحية، بيروت" value={area} onChange={(e) => setArea(e.target.value)} />
-          <label className="block text-sm font-bold">العنوان بالتفصيل</label>
-          <textarea className={input} rows={2} placeholder="الشارع، البناية، الطابق، علامة مميزة" value={address} onChange={(e) => setAddress(e.target.value)} />
-          <label className="block text-sm font-bold">ملاحظات (اختياري)</label>
+          <label className="block text-sm font-bold">{t("المنطقة", "Area")}</label>
+          <input className={input} placeholder={t("مثال: بعلبك، زحلة، الضاحية، بيروت", "e.g. Baalbek, Zahle, Dahieh, Beirut")} value={area} onChange={(e) => setArea(e.target.value)} />
+          <label className="block text-sm font-bold">{t("العنوان بالتفصيل", "Full address")}</label>
+          <textarea className={input} rows={2} placeholder={t("الشارع، البناية، الطابق، علامة مميزة", "Street, building, floor, landmark")} value={address} onChange={(e) => setAddress(e.target.value)} />
+          <label className="block text-sm font-bold">{t("ملاحظات (اختياري)", "Notes (optional)")}</label>
           <textarea className={input} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
           {needsRx && (
             <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-3">
-              <p className="mb-2 text-sm font-bold text-amber-900">طلبك فيه دواء بوصفة طبية — صوّر الوصفة:</p>
+              <p className="mb-2 text-sm font-bold text-amber-900">{t("طلبك فيه دواء بوصفة طبية — صوّر الوصفة:", "Your order has a prescription medicine — take a photo of the prescription:")}</p>
               <input type="file" accept="image/*" capture="environment" onChange={async (e) => {
                 const f = e.target.files?.[0];
                 if (f) setRxImage(await resizeImage(f).catch(() => null));
               }} />
-              {rxImage && <p className="mt-2 text-xs font-bold text-[#9e5f69]">✓ تم إرفاق الوصفة</p>}
+              {rxImage && <p className="mt-2 text-xs font-bold text-[#9e5f69]">{t("✓ تم إرفاق الوصفة", "✓ Prescription attached")}</p>}
             </div>
           )}
-          {deborahTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">مجموع Deborah: <b>{usd(deborahTotal)}</b> + كلفة التوصيل. اكتب الألوان/الدرجات المطلوبة في الملاحظات.</p>}
-          {lattafaTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">مجموع عطور لطافة: <b>{usd(lattafaTotal)}</b> + كلفة التوصيل تُبلَّغ بها.</p>}
+          {deborahTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">{t("مجموع Deborah", "Deborah total")}: <b>{usd(deborahTotal)}</b> {t("+ كلفة التوصيل. اكتب الألوان/الدرجات المطلوبة في الملاحظات.", "+ delivery. Write the shades you want in the notes.")}</p>}
+          {lattafaTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">{t("مجموع عطور لطافة", "Lattafa total")}: <b>{usd(lattafaTotal)}</b> {t("+ كلفة التوصيل تُبلَّغ بها.", "+ delivery cost (we will tell you).")}</p>}
           {error && <p className="rounded-2xl border-2 border-red-300 bg-red-50 p-3 text-sm font-bold text-red-700">{error}</p>}
         </main>
       )}
@@ -618,11 +622,11 @@ export default function ShopHome() {
       {cart.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t-2 border-ink bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {step === "browse" ? (
-            <button className={`${btn} w-full bg-[#9e5f69] text-white`} onClick={() => setStep("checkout")}>متابعة الطلب ({count})</button>
+            <button className={`${btn} w-full bg-[#9e5f69] text-white`} onClick={() => setStep("checkout")}>{t("متابعة الطلب", "Checkout")} ({count})</button>
           ) : (
             <button className={`${btn} w-full bg-[#9e5f69] text-white`}
               disabled={busy || area.trim().length < 2 || address.trim().length < 3 || (needsRx && !rxImage)} onClick={submit}>
-              {busy ? "جارٍ الإرسال..." : "أرسل الطلب"}
+              {busy ? t("جارٍ الإرسال...", "Sending...") : t("أرسل الطلب", "Send order")}
             </button>
           )}
         </div>

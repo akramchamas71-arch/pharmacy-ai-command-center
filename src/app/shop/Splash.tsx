@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "./i18n";
 
 /** Opening video «حدك وين ما كنت» — shown once per app session, skippable. */
 export function Splash() {
   const [show, setShow] = useState(false);
   const [muted, setMuted] = useState(true);
   const ref = useRef<HTMLVideoElement>(null);
+  const { t: tr } = useLang();
 
   useEffect(() => {
     try {
@@ -40,10 +42,10 @@ export function Splash() {
           className="rounded-full border-2 border-white bg-black/30 px-4 py-2 text-sm font-bold text-white"
           onClick={() => { setMuted((m) => !m); ref.current?.play().catch(() => {}); }}
         >
-          {muted ? "🔇 الصوت" : "🔊 الصوت"}
+          {muted ? tr("🔇 الصوت", "🔇 Sound") : tr("🔊 الصوت", "🔊 Sound")}
         </button>
         <button className="rounded-full border-2 border-ink bg-[#9e5f69] px-6 py-2.5 text-base font-extrabold text-white shadow-pop-sm" onClick={close}>
-          دخول ←
+          {tr("دخول ←", "Enter →")}
         </button>
       </div>
     </div>
