@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "اطلب أدويتك ومستلزماتك من الصيدليات الشريكة وتوصيل إلى البيت",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Carelink", statusBarStyle: "default" },
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-180.png" },
+  icons: { icon: "/icons/v2/icon-192.png", apple: "/icons/v2/apple-180.png" },
 };
 
 export const viewport: Viewport = {

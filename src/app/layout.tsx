@@ -28,6 +28,8 @@ const rajdhani = Rajdhani({
 export const metadata: Metadata = {
   title: "PHARMACY AI COMMAND CENTER",
   description: "مركز قيادة الصيدلية الذكي — لوحة التحكم",
+  manifest: "/dashboard.webmanifest",
+  icons: { icon: "/icons/dash-192.png", apple: "/icons/dash-apple-180.png" },
 };
 
 // الشكل الرقمي الفاتح هو الافتراضي؛ يُطبَّق اختيار المستخدم (ليلي/كلاسيكي) قبل الرسم لتجنّب الوميض.
