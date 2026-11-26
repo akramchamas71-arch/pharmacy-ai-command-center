@@ -27,7 +27,8 @@ interface LItem { id: string; brand: string; brandKey: string; name: string; siz
 type CartLine =
   | { kind: "pharmacy"; key: string; product: Product; qty: number }
   | { kind: "lattafa"; key: string; item: LItem; qty: number }
-  | { kind: "deborah"; key: string; item: DItem; qty: number };
+  | { kind: "deborah"; key: string; item: DItem; qty: number }
+  | { kind: "clarins"; key: string; item: DItem; qty: number };
 interface Me { name: string | null; phone: string; address: string | null }
 
 const RX = (t: string) => t === "PRESCRIPTION";
@@ -41,7 +42,7 @@ export default function ShopHome() {
   const COS_EN: Record<string, string> = { skin: "🧴 Skin care", makeup: "💄 Makeup", perfume: "🌸 Fragrance & deo", hair: "💇 Hair", baby: "👶 Baby & milk", body: "🛁 Personal care", dental: "🦷 Dental", devices: "🩺 Devices & supplies", food: "🥣 Food" };
   const DEB_EN: Record<string, string> = { face: "Face", eyes: "Eyes", lips: "Lips", nails: "Nails" };
   const [me, setMe] = useState<Me | null>(null);
-  const [tab, setTab] = useState<"home" | "consult" | "tips" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "album">("home");
+  const [tab, setTab] = useState<"home" | "consult" | "tips" | "pharmacy" | "cosmetics" | "lattafa" | "deborah" | "clarins" | "album">("home");
   const [step, setStep] = useState<"browse" | "checkout">("browse");
   const [cart, setCart] = useState<CartLine[]>([]);
 
@@ -95,6 +96,9 @@ export default function ShopHome() {
   const [dcat, setDcat] = useState<{ key: string; label: string }[]>([]);
   const [ditems, setDitems] = useState<DItem[] | null>(null);
   const [dsel, setDsel] = useState("ALL");
+  const [kitems, setKitems] = useState<DItem[] | null>(null);
+  const [kcat, setKcat] = useState<{ key: string; label: string }[]>([]);
+  const [ksel, setKsel] = useState("ALL");
 
   // drug browse (before searching)
   const [letter, setLetter] = useState("");
@@ -155,6 +159,14 @@ export default function ShopHome() {
         .catch(() => setDitems([]));
     }
   }, [tab, ditems]);
+
+  useEffect(() => {
+    if (tab === "clarins" && !kitems) {
+      shopFetch<{ categories: { key: string; label: string }[]; items: DItem[] }>("/api/shop/clarins")
+        .then((d) => { setKcat(d.categories); setKitems(d.items); })
+        .catch(() => setKitems([]));
+    }
+  }, [tab, kitems]);
 
   async function loadDrugs(l: string, offset: number) {
     setDloading(true);
@@ -245,6 +257,7 @@ export default function ShopHome() {
   const count = cart.reduce((s, l) => s + l.qty, 0);
   const lattafaTotal = cart.reduce((s, l) => s + (l.kind === "lattafa" ? l.item.price * l.qty : 0), 0);
   const deborahTotal = cart.reduce((s, l) => s + (l.kind === "deborah" ? l.item.price * l.qty : 0), 0);
+  const clarinsTotal = cart.reduce((s, l) => s + (l.kind === "clarins" ? l.item.price * l.qty : 0), 0);
 
   async function submit() {
     setBusy(true);
@@ -254,6 +267,7 @@ export default function ShopHome() {
         body: {
           items: cart.filter((l) => l.kind === "pharmacy").map((l) => ({ productId: (l as Extract<CartLine, { kind: "pharmacy" }>).product.id, qty: l.qty })),
           lattafa: cart.filter((l) => l.kind === "lattafa").map((l) => ({ id: (l as Extract<CartLine, { kind: "lattafa" }>).item.id, qty: l.qty })),
+          clarins: cart.filter((l) => l.kind === "clarins").map((l) => ({ id: (l as Extract<CartLine, { kind: "clarins" }>).item.id, qty: l.qty })),
           deborah: cart.filter((l) => l.kind === "deborah").map((l) => ({ id: (l as Extract<CartLine, { kind: "deborah" }>).item.id, qty: l.qty })),
           area, address, name: name || undefined, notes: notes || undefined,
           prescription: needsRx ? rxImage : undefined,
@@ -287,7 +301,7 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
-            {([["home", "🏠"], ["consult", t("🩺 استشارة", "🩺 Ask")], ["tips", t("💡 معلومة اليوم", "💡 Daily tip")], ["pharmacy", t("💊 صيدلية", "💊 Pharmacy")], ["cosmetics", t("🧴 كوزماتيك", "🧴 Cosmetics")], ["lattafa", t("✨ لطافة", "✨ Lattafa")], ["deborah", "💄 Deborah"], ["album", t("🖼️ ألبوم", "🖼️ Gallery")]] as const).map(([k, label]) => (
+            {([["home", "🏠"], ["consult", t("🩺 استشارة", "🩺 Ask")], ["tips", t("💡 معلومة اليوم", "💡 Daily tip")], ["pharmacy", t("💊 صيدلية", "💊 Pharmacy")], ["cosmetics", t("🧴 كوزماتيك", "🧴 Cosmetics")], ["lattafa", t("✨ لطافة", "✨ Lattafa")], ["deborah", "💄 Deborah"], ["clarins", "🌹 Clarins"], ["album", t("🖼️ ألبوم", "🖼️ Gallery")]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
@@ -530,6 +544,38 @@ export default function ShopHome() {
         </main>
       )}
 
+      {step === "browse" && tab === "clarins" && (
+        <main className="flex-1 space-y-3 p-4 pb-28">
+          <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">CLARINS PARIS — {t("من صيدلية فارماكير", "from Pharmacare pharmacy")}</p>
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+            <button className={chip(ksel === "ALL")} onClick={() => setKsel("ALL")}>{t("الكل", "All")}</button>
+            {kcat.map((c) => (
+              <button key={c.key} className={chip(ksel === c.key)} onClick={() => setKsel(c.key)}>{lang === "en" ? DEB_EN[c.key] ?? c.label : c.label}</button>
+            ))}
+          </div>
+          {kitems === null && <p className="text-center text-sm text-slate-500">{t("جارٍ التحميل...", "Loading...")}</p>}
+          <div className="grid grid-cols-2 gap-3">
+            {(kitems ?? []).filter((i) => ksel === "ALL" || i.cat === ksel).map((i) => (
+              <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
+                <div className="flex aspect-square items-center justify-center bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-contain" />
+                </div>
+                <div className="flex flex-1 flex-col gap-1 p-2.5">
+                  <p className="text-[11px] font-bold text-[#9e5f69]">CLARINS</p>
+                  <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
+                  <div className="mt-auto flex items-center justify-between pt-1">
+                    <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
+                    <button className="rounded-xl border-2 border-ink bg-sun px-2.5 py-1 text-sm font-extrabold" onClick={() => addLine({ kind: "clarins", key: `k-${i.id}`, item: i, qty: 1 })}>+</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="pt-2 text-center text-xs text-slate-500">{t("الدرجات حسب المتوفر في الصيدلية — اكتبي الدرجة المطلوبة (مثل 105N أو 03) في الملاحظات. نؤكد التوفر قبل التوصيل.", "Shades as available — write the shade you want (e.g. 105N or 03) in the notes. We confirm availability before delivery.")}</p>
+        </main>
+      )}
+
       {step === "browse" && tab === "lattafa" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
           <input className={input} placeholder={t("ابحث عن عطر: Yara، Asad، Khamrah...", "Search a perfume: Yara, Asad, Khamrah...")} value={lq} onChange={(e) => { setLq(e.target.value); setShown(40); }} />
@@ -578,7 +624,7 @@ export default function ShopHome() {
           {cart.map((l) => (
             <div key={l.key} className="flex items-center justify-between gap-2">
               <p className="min-w-0 truncate text-sm" dir="auto">
-                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : l.kind === "deborah" ? `DEBORAH ${l.item.name} — ${usd(l.item.price)}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
+                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : l.kind === "deborah" ? `DEBORAH ${l.item.name} — ${usd(l.item.price)}` : l.kind === "clarins" ? `CLARINS ${l.item.name} — ${usd(l.item.price)}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <button className="h-8 w-8 rounded-full border-2 border-ink font-bold" onClick={() => setQty(l.key, l.qty - 1)}>−</button>
@@ -587,6 +633,7 @@ export default function ShopHome() {
               </div>
             </div>
           ))}
+          {clarinsTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">{t("مجموع Clarins", "Clarins total")}: {usd(clarinsTotal)}</p>}
           {deborahTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">{t("مجموع Deborah", "Deborah total")}: {usd(deborahTotal)}</p>}
           {lattafaTotal > 0 && <p className="border-t border-dashed pt-2 text-sm font-bold">{t("مجموع عطور لطافة", "Lattafa total")}: {usd(lattafaTotal)}</p>}
         </section>
@@ -613,6 +660,7 @@ export default function ShopHome() {
               {rxImage && <p className="mt-2 text-xs font-bold text-[#9e5f69]">{t("✓ تم إرفاق الوصفة", "✓ Prescription attached")}</p>}
             </div>
           )}
+          {clarinsTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">{t("مجموع Clarins", "Clarins total")}: <b>{usd(clarinsTotal)}</b> {t("+ كلفة التوصيل. اكتبي الدرجة المطلوبة في الملاحظات.", "+ delivery. Write the shade you want in the notes.")}</p>}
           {deborahTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">{t("مجموع Deborah", "Deborah total")}: <b>{usd(deborahTotal)}</b> {t("+ كلفة التوصيل. اكتب الألوان/الدرجات المطلوبة في الملاحظات.", "+ delivery. Write the shades you want in the notes.")}</p>}
           {lattafaTotal > 0 && <p className="rounded-2xl bg-white p-3 text-sm">{t("مجموع عطور لطافة", "Lattafa total")}: <b>{usd(lattafaTotal)}</b> {t("+ كلفة التوصيل تُبلَّغ بها.", "+ delivery cost (we will tell you).")}</p>}
           {error && <p className="rounded-2xl border-2 border-red-300 bg-red-50 p-3 text-sm font-bold text-red-700">{error}</p>}

@@ -1,0 +1,171 @@
+[
+{
+"id": "c01",
+"raw": "CLARINS SOS PRIMER",
+"name": "SOS Primer — blurs pores, matifies 30ml",
+"cat": "face",
+"price": 50,
+"cost": 33.79,
+"image": "/clarins/c01.jpg",
+"images": [
+"/clarins/c01.jpg"
+]
+},
+{
+"id": "c02",
+"raw": "CLARINS EVERLASTING FDT",
+"name": "Everlasting Foundation — long-wearing matte 30ml",
+"cat": "face",
+"price": 66,
+"cost": 44.6,
+"image": "/clarins/c02.jpg",
+"images": [
+"/clarins/c02.jpg"
+]
+},
+{
+"id": "c03",
+"raw": "CLARINS SKIN ILLUSION",
+"name": "Skin Illusion Foundation SPF15 30ml",
+"cat": "face",
+"price": 66,
+"cost": 44.6,
+"image": "/clarins/c03.jpg",
+"images": [
+"/clarins/c03.jpg",
+"/clarins/c03-2.jpg"
+]
+},
+{
+"id": "c04",
+"raw": "CLARINS MILKY BOOST CREAM",
+"name": "Milky Boost Cream — tinted 45ml",
+"cat": "face",
+"price": 52,
+"cost": 35.14,
+"image": "/clarins/c04.jpg",
+"images": [
+"/clarins/c04.jpg",
+"/clarins/c04-2.jpg"
+]
+},
+{
+"id": "c05",
+"raw": "CLARINS INSTANT CONCEALER",
+"name": "Instant Concealer 15ml",
+"cat": "face",
+"price": 49,
+"cost": 33.1,
+"image": "/clarins/c05.jpg",
+"images": [
+"/clarins/c05.jpg",
+"/clarins/c05-2.jpg"
+]
+},
+{
+"id": "c06",
+"raw": "CLARINS EVERLASTING CONCEALER",
+"name": "Everlasting Concealer 12ml",
+"cat": "face",
+"price": 42,
+"cost": 28.38,
+"image": "/clarins/c06.jpg",
+"images": [
+"/clarins/c06.jpg"
+]
+},
+{
+"id": "c07",
+"raw": "CLARINS JOLI BLUSH",
+"name": "Joli Blush 5g",
+"cat": "face",
+"price": 53,
+"cost": 35.81,
+"image": "/clarins/c07.jpg",
+"images": [
+"/clarins/c07.jpg"
+]
+},
+{
+"id": "c08",
+"raw": "CLARINS EVER MATTE LOOSE POWDER",
+"name": "Ever Matte Loose Powder 15g",
+"cat": "face",
+"price": 56,
+"cost": 37.84,
+"image": "/clarins/c08.jpg",
+"images": [
+"/clarins/c08.jpg"
+]
+},
+{
+"id": "c09",
+"raw": "CLARINS BRONZING COMPACT",
+"name": "Bronzing Compact 19g",
+"cat": "face",
+"price": 65,
+"cost": 43.92,
+"image": "/clarins/c09.jpg",
+"images": [
+"/clarins/c09.jpg"
+]
+},
+{
+"id": "c10",
+"raw": "CLARINS WONDER PERFECT MASCARA",
+"name": "Wonder Perfect Mascara 4D",
+"cat": "eyes",
+"price": 47,
+"cost": 31.76,
+"image": "/clarins/c10.jpg",
+"images": [
+"/clarins/c10.jpg"
+]
+},
+{
+"id": "c11",
+"raw": "CLARINS COFFRET EYES MASCARA +DEMAQ",
+"name": "All About Eyes Set — Supra Volume Mascara + Micellar Water",
+"cat": "eyes",
+"price": 48,
+"cost": 32.43,
+"image": "/clarins/c11.jpg",
+"images": [
+"/clarins/c11.jpg"
+]
+},
+{
+"id": "c12",
+"raw": "CLARINS LIP COMFORT OIL",
+"name": "Lip Comfort Oil 7ml",
+"cat": "lips",
+"price": 34,
+"cost": 22.97,
+"image": "/clarins/c12.jpg",
+"images": [
+"/clarins/c12.jpg"
+]
+},
+{
+"id": "c13",
+"raw": "CLARINS JOLI ROUGE CRAYON",
+"name": "Joli Rouge Crayon 2-in-1",
+"cat": "lips",
+"price": 35,
+"cost": 23.64,
+"image": "/clarins/c13.jpg",
+"images": [
+"/clarins/c13.jpg"
+]
+},
+{
+"id": "c14",
+"raw": "CLARINS JOLI ROUGE",
+"name": "Joli Rouge Lipstick",
+"cat": "lips",
+"price": 47,
+"cost": 31.76,
+"image": null,
+"images": []
+}
+]
