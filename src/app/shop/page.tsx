@@ -533,6 +533,7 @@ export default function ShopHome() {
                 <div className="flex flex-1 flex-col gap-1 p-2.5">
                   <p className="text-[11px] font-bold text-[#9e5f69]">DEBORAH</p>
                   <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
+                  {i.shades && <p className="line-clamp-3 text-[11px] text-slate-500" dir="ltr">{t("الدرجات", "Shades")}: {i.shades}</p>}
                   <div className="mt-auto flex items-center justify-between pt-1">
                     <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
                     <button className="rounded-xl border-2 border-ink bg-sun px-2.5 py-1 text-sm font-extrabold" onClick={() => addLine({ kind: "deborah", key: `d-${i.id}`, item: i, qty: 1 })}>+</button>

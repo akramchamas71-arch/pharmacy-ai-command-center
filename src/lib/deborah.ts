@@ -14,6 +14,9 @@ export interface DeborahItem {
   price: number;
   listPrice: number;
   image: string;
+  /** Shades/colours in stock at الجواد كير (from SoftPharm, 26 Nov 2026). */
+  shades?: string;
+  inStock?: boolean;
 }
 
 export const DEBORAH_CATALOG = catalog as DeborahItem[];

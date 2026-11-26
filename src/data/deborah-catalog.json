@@ -5,7 +5,9 @@
 "cat": "face",
 "price": 24,
 "listPrice": 23.6,
-"image": "/deborah/d01.jpg"
+"image": "/deborah/d01.jpg",
+"shades": "01 · 02 · 03",
+"inStock": true
 },
 {
 "id": "d02",
@@ -13,7 +15,9 @@
 "cat": "eyes",
 "price": 10,
 "listPrice": 10,
-"image": "/deborah/d02.jpg"
+"image": "/deborah/d02.jpg",
+"inStock": true,
+"shades": "Transparent"
 },
 {
 "id": "d03",
@@ -21,7 +25,9 @@
 "cat": "face",
 "price": 13,
 "listPrice": 13.35,
-"image": "/deborah/d03.jpg"
+"image": "/deborah/d03.jpg",
+"shades": "01 · 02 · 03",
+"inStock": true
 },
 {
 "id": "d04",
@@ -29,7 +35,9 @@
 "cat": "eyes",
 "price": 8,
 "listPrice": 7.77,
-"image": "/deborah/d04.jpg"
+"image": "/deborah/d04.jpg",
+"shades": "Black",
+"inStock": true
 },
 {
 "id": "d05",
@@ -37,7 +45,9 @@
 "cat": "eyes",
 "price": 17,
 "listPrice": 16.65,
-"image": "/deborah/d05.jpg"
+"image": "/deborah/d05.jpg",
+"inStock": true,
+"shades": "Black"
 },
 {
 "id": "d06",
@@ -45,7 +55,9 @@
 "cat": "eyes",
 "price": 17,
 "listPrice": 16.65,
-"image": "/deborah/d06.jpg"
+"image": "/deborah/d06.jpg",
+"shades": "Black",
+"inStock": true
 },
 {
 "id": "d07",
@@ -53,7 +65,9 @@
 "cat": "nails",
 "price": 5,
 "listPrice": 4.5,
-"image": "/deborah/d07.jpg"
+"image": "/deborah/d07.jpg",
+"shades": "00 · 21 · 39 · 580 · 740 · 827 · 828 · 831 · 853 · 854 · 858 · 859 · 860 · 874 · 875 · 876 · 878",
+"inStock": true
 },
 {
 "id": "d08",
@@ -61,7 +75,9 @@
 "cat": "nails",
 "price": 15,
 "listPrice": 15,
-"image": "/deborah/d08.jpg"
+"image": "/deborah/d08.jpg",
+"shades": "Cuticle Scrub · Instant Hardener · Smoothing Base · Strengthening Base · Top Coat · Whitening Base",
+"inStock": true
 },
 {
 "id": "d09",
@@ -69,7 +85,9 @@
 "cat": "eyes",
 "price": 17,
 "listPrice": 16.65,
-"image": "/deborah/d09.jpg"
+"image": "/deborah/d09.jpg",
+"shades": "01 Black · 02 Brown",
+"inStock": true
 },
 {
 "id": "d10",
@@ -77,7 +95,9 @@
 "cat": "face",
 "price": 20,
 "listPrice": 20,
-"image": "/deborah/d10.jpg"
+"image": "/deborah/d10.jpg",
+"shades": "01 · 02",
+"inStock": true
 },
 {
 "id": "d11",
@@ -85,7 +105,9 @@
 "cat": "nails",
 "price": 5,
 "listPrice": 4.5,
-"image": "/deborah/d11.jpg"
+"image": "/deborah/d11.jpg",
+"shades": "05 · 08 · 11 · 12 · 15 · 22 · 30 · 32 · 37 · 38 · 41 · 44 · 65 · 72 · 74 · 91 · 92",
+"inStock": true
 },
 {
 "id": "d12",
@@ -93,7 +115,8 @@
 "cat": "face",
 "price": 10,
 "listPrice": 10,
-"image": "/deborah/d12.jpg"
+"image": "/deborah/d12.jpg",
+"inStock": true
 },
 {
 "id": "d13",
@@ -101,7 +124,9 @@
 "cat": "face",
 "price": 11,
 "listPrice": 11.1,
-"image": "/deborah/d13.jpg"
+"image": "/deborah/d13.jpg",
+"shades": "01 · 02 · 03 · 04 · 05",
+"inStock": true
 },
 {
 "id": "d14",
@@ -109,7 +134,8 @@
 "cat": "face",
 "price": 15,
 "listPrice": 15,
-"image": "/deborah/d14.jpg"
+"image": "/deborah/d14.jpg",
+"inStock": true
 },
 {
 "id": "d15",
@@ -117,7 +143,8 @@
 "cat": "eyes",
 "price": 13,
 "listPrice": 13.33,
-"image": "/deborah/d15.jpg"
+"image": "/deborah/d15.jpg",
+"inStock": true
 },
 {
 "id": "d16",
@@ -125,7 +152,9 @@
 "cat": "face",
 "price": 11,
 "listPrice": 11.3,
-"image": "/deborah/d16.jpg"
+"image": "/deborah/d16.jpg",
+"shades": "08 · 10 · 11 · 12 · 13 · 14 · 15 · 16",
+"inStock": true
 },
 {
 "id": "d17",
@@ -133,7 +162,9 @@
 "cat": "face",
 "price": 20,
 "listPrice": 20.3,
-"image": "/deborah/d17.jpg"
+"image": "/deborah/d17.jpg",
+"shades": "01 · 02",
+"inStock": true
 },
 {
 "id": "d18",
@@ -141,7 +172,9 @@
 "cat": "face",
 "price": 17,
 "listPrice": 16.65,
-"image": "/deborah/d18.jpg"
+"image": "/deborah/d18.jpg",
+"shades": "01 · 02",
+"inStock": true
 },
 {
 "id": "d19",
@@ -149,7 +182,9 @@
 "cat": "eyes",
 "price": 9,
 "listPrice": 8.9,
-"image": "/deborah/d19.jpg"
+"image": "/deborah/d19.jpg",
+"shades": "01 · 02 · 05 · 06 · 07 · 08 · 10 · 13 · 16 · 17 · 18",
+"inStock": true
 },
 {
 "id": "d20",
@@ -157,7 +192,9 @@
 "cat": "eyes",
 "price": 15,
 "listPrice": 15,
-"image": "/deborah/d20.jpg"
+"image": "/deborah/d20.jpg",
+"shades": "01 · 02 · 03 · 05 · 12 · 13",
+"inStock": true
 },
 {
 "id": "d21",
@@ -165,7 +202,9 @@
 "cat": "face",
 "price": 10,
 "listPrice": 10,
-"image": "/deborah/d21.jpg"
+"image": "/deborah/d21.jpg",
+"shades": "24 · 29 · 30 · 33 · 34 · 41 · 42",
+"inStock": true
 },
 {
 "id": "d22",
@@ -173,7 +212,9 @@
 "cat": "eyes",
 "price": 6,
 "listPrice": 6.2,
-"image": "/deborah/d22.jpg"
+"image": "/deborah/d22.jpg",
+"shades": "01 · 02 · 04 · 05 · 06 · 07 · 08 · 09",
+"inStock": true
 },
 {
 "id": "d23",
@@ -181,7 +222,9 @@
 "cat": "eyes",
 "price": 13,
 "listPrice": 12.8,
-"image": "/deborah/d23.jpg"
+"image": "/deborah/d23.jpg",
+"shades": "01 · 02 · 03 · 05 · 06 · 07",
+"inStock": true
 },
 {
 "id": "d24",
@@ -189,7 +232,9 @@
 "cat": "eyes",
 "price": 10,
 "listPrice": 9.5,
-"image": "/deborah/d24.jpg"
+"image": "/deborah/d24.jpg",
+"shades": "117 · 121 · 124 · 125 · 127 · 129",
+"inStock": true
 },
 {
 "id": "d25",
@@ -197,7 +242,9 @@
 "cat": "eyes",
 "price": 10,
 "listPrice": 10,
-"image": "/deborah/d25.jpg"
+"image": "/deborah/d25.jpg",
+"inStock": true,
+"shades": "Black"
 },
 {
 "id": "d26",
@@ -205,7 +252,9 @@
 "cat": "eyes",
 "price": 9,
 "listPrice": 9,
-"image": "/deborah/d26.jpg"
+"image": "/deborah/d26.jpg",
+"shades": "01",
+"inStock": true
 },
 {
 "id": "d27",
@@ -213,7 +262,9 @@
 "cat": "eyes",
 "price": 9,
 "listPrice": 8.5,
-"image": "/deborah/d27.jpg"
+"image": "/deborah/d27.jpg",
+"shades": "251 · 253 · 254 · 261 · 264 · 265 · 266 · 267",
+"inStock": true
 },
 {
 "id": "d28",
@@ -221,7 +272,9 @@
 "cat": "lips",
 "price": 8,
 "listPrice": 7.8,
-"image": "/deborah/d28.jpg"
+"image": "/deborah/d28.jpg",
+"shades": "01 · 05 · 06 · 07 · 08 · 10 · 11 · 12",
+"inStock": true
 },
 {
 "id": "d29",
@@ -229,7 +282,9 @@
 "cat": "lips",
 "price": 6,
 "listPrice": 6.2,
-"image": "/deborah/d29.jpg"
+"image": "/deborah/d29.jpg",
+"shades": "01 · 02 · 05 · 06 · 07 · 08 · 09 · 10 · 12",
+"inStock": true
 },
 {
 "id": "d30",
@@ -237,7 +292,9 @@
 "cat": "eyes",
 "price": 8,
 "listPrice": 8.4,
-"image": "/deborah/d30.jpg"
+"image": "/deborah/d30.jpg",
+"shades": "01 · 02 · 03 · 04 · 05 · 06 · 07",
+"inStock": true
 },
 {
 "id": "d31",
@@ -245,7 +302,9 @@
 "cat": "face",
 "price": 16,
 "listPrice": 16,
-"image": "/deborah/d31.jpg"
+"image": "/deborah/d31.jpg",
+"shades": "01 · 02 · 03 · 04 · 05",
+"inStock": true
 },
 {
 "id": "d32",
@@ -253,7 +312,9 @@
 "cat": "face",
 "price": 22,
 "listPrice": 22.2,
-"image": "/deborah/d32.jpg"
+"image": "/deborah/d32.jpg",
+"shades": "02 · 03 · 04 · 05",
+"inStock": true
 },
 {
 "id": "d33",
@@ -261,7 +322,9 @@
 "cat": "face",
 "price": 22,
 "listPrice": 22.2,
-"image": "/deborah/d33.jpg"
+"image": "/deborah/d33.jpg",
+"shades": "02 · 04",
+"inStock": true
 },
 {
 "id": "d34",
@@ -269,7 +332,9 @@
 "cat": "lips",
 "price": 15,
 "listPrice": 15,
-"image": "/deborah/d34.jpg"
+"image": "/deborah/d34.jpg",
+"shades": "01 · 04 · 05 · 07 · 08 · 09 · 10 · 11 · 12 · 13 · 14 · 19 · 20",
+"inStock": true
 },
 {
 "id": "d35",
@@ -277,7 +342,9 @@
 "cat": "face",
 "price": 13,
 "listPrice": 13.32,
-"image": "/deborah/d35.jpg"
+"image": "/deborah/d35.jpg",
+"shades": "01 · 02 · 07 · 08",
+"inStock": true
 },
 {
 "id": "d36",
@@ -285,7 +352,9 @@
 "cat": "face",
 "price": 22,
 "listPrice": 22.2,
-"image": "/deborah/d36.jpg"
+"image": "/deborah/d36.jpg",
+"shades": "01 · 02 · 03 · 04",
+"inStock": true
 },
 {
 "id": "d37",
@@ -293,7 +362,9 @@
 "cat": "eyes",
 "price": 8,
 "listPrice": 7.77,
-"image": "/deborah/d37.jpg"
+"image": "/deborah/d37.jpg",
+"shades": "Black",
+"inStock": true
 },
 {
 "id": "d38",
@@ -301,7 +372,9 @@
 "cat": "lips",
 "price": 13,
 "listPrice": 13.32,
-"image": "/deborah/d38.jpg"
+"image": "/deborah/d38.jpg",
+"shades": "04 · 05 · 06 · 07 · 08 · 09 · 10 · 11 · 12 · 13",
+"inStock": true
 },
 {
 "id": "d39",
@@ -309,7 +382,9 @@
 "cat": "lips",
 "price": 8,
 "listPrice": 7.7,
-"image": "/deborah/d39.jpg"
+"image": "/deborah/d39.jpg",
+"shades": "01 · 02 · 03 · 04",
+"inStock": true
 },
 {
 "id": "d40",
@@ -317,7 +392,9 @@
 "cat": "face",
 "price": 17,
 "listPrice": 16.75,
-"image": "/deborah/d40.jpg"
+"image": "/deborah/d40.jpg",
+"shades": "02",
+"inStock": true
 },
 {
 "id": "d41",
@@ -325,7 +402,9 @@
 "cat": "lips",
 "price": 13,
 "listPrice": 13.33,
-"image": "/deborah/d41.jpg"
+"image": "/deborah/d41.jpg",
+"shades": "516 · 523 · 532 · 534 · 601 · 602 · 603 · 605 · 805 · 806 · 807 · 808 · 809 · 810 · 811 · 812 · 813 · 814 · 815",
+"inStock": true
 },
 {
 "id": "d42",
@@ -333,7 +412,9 @@
 "cat": "eyes",
 "price": 13,
 "listPrice": 13.35,
-"image": "/deborah/d42.jpg"
+"image": "/deborah/d42.jpg",
+"shades": "01 Black · 02 Brown · 03 Violet",
+"inStock": true
 },
 {
 "id": "d43",
@@ -341,7 +422,9 @@
 "cat": "face",
 "price": 17,
 "listPrice": 16.75,
-"image": "/deborah/d43.jpg"
+"image": "/deborah/d43.jpg",
+"shades": "01 · 02",
+"inStock": true
 },
 {
 "id": "d44",
@@ -349,6 +432,7 @@
 "cat": "face",
 "price": 17,
 "listPrice": 16.75,
-"image": "/deborah/d44.jpg"
+"image": "/deborah/d44.jpg",
+"inStock": true
 }
 ]
