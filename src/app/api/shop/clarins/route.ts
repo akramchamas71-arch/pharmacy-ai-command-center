@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(
     {
       categories: CLARINS_CATEGORIES,
-      items: CLARINS_CATALOG.map((i) => ({ id: i.id, name: i.name, cat: i.cat, price: i.price, image: i.image ?? "/icons/v2/icon-512.png", images: i.images })),
+      items: CLARINS_CATALOG.map((i) => ({ id: i.id, brand: i.brand, name: i.name, cat: i.cat, price: i.price, shades: i.shades ?? null, image: i.image ?? "/icons/v2/icon-512.png", images: i.images })),
     },
     { headers: { "Cache-Control": "private, max-age=600" } }
   );

@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const clarinsLines: string[] = [];
   if (clarins.length) {
     const branch = await getClarinsBranch();
-    if (!branch) return NextResponse.json({ error: "تعذّر تحديد الصيدلية المسؤولة عن منتجات Clarins." }, { status: 400 });
+    if (!branch) return NextResponse.json({ error: "تعذّر تحديد الصيدلية المسؤولة عن منتجات Clarins و Clinique." }, { status: 400 });
     for (const c of clarins) {
       const it = getClarinsItem(c.id);
       if (!it) return NextResponse.json({ error: "أحد أصناف Clarins لم يعد متوفراً في القائمة." }, { status: 400 });
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     `العنوان: ${address}`,
     ...(lines.length ? ["الأصناف (من الصيدلية):", ...lines] : []),
     ...(lattafaLines.length ? ["أصناف شركة لطافة (السعر ثابت ومعروف):", ...lattafaLines] : []),
-    ...(clarinsLines.length ? ["أصناف CLARINS (حصراً من صيدلية فارماكير، السعر ثابت ومعروف):", ...clarinsLines] : []),
+    ...(clarinsLines.length ? ["أصناف CLARINS / CLINIQUE (حصراً من صيدلية فارماكير، السعر ثابت ومعروف):", ...clarinsLines] : []),
     ...(deborahLines.length ? ["أصناف DEBORAH (حصراً من صيدلية الجواد كير، السعر ثابت ومعروف):", ...deborahLines] : []),
     notes ? `ملاحظات: ${notes}` : "",
   ]

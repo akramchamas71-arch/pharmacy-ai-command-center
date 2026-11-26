@@ -6,10 +6,11 @@
 "cat": "face",
 "price": 50,
 "cost": 33.79,
-"image": "/clarins/c01.jpg",
+"image": "/clarins/c01-v2-1.jpg",
 "images": [
-"/clarins/c01.jpg"
-]
+"/clarins/c01-v2-1.jpg"
+],
+"brand": "CLARINS"
 },
 {
 "id": "c02",
@@ -18,10 +19,13 @@
 "cat": "face",
 "price": 66,
 "cost": 44.6,
-"image": "/clarins/c02.jpg",
+"image": "/clarins/c02-v2-1.jpg",
 "images": [
-"/clarins/c02.jpg"
-]
+"/clarins/c02-v2-1.jpg",
+"/clarins/c02-v2-2.jpg"
+],
+"brand": "CLARINS",
+"shades": "108W · 110.5W · 113C"
 },
 {
 "id": "c03",
@@ -30,11 +34,13 @@
 "cat": "face",
 "price": 66,
 "cost": 44.6,
-"image": "/clarins/c03.jpg",
+"image": "/clarins/c03-v2-1.jpg",
 "images": [
-"/clarins/c03.jpg",
-"/clarins/c03-2.jpg"
-]
+"/clarins/c03-v2-1.jpg",
+"/clarins/c03-v2-2.jpg"
+],
+"brand": "CLARINS",
+"shades": "105N · 112C"
 },
 {
 "id": "c04",
@@ -43,11 +49,14 @@
 "cat": "face",
 "price": 52,
 "cost": 35.14,
-"image": "/clarins/c04.jpg",
+"image": "/clarins/c04-v2-1.jpg",
 "images": [
-"/clarins/c04.jpg",
-"/clarins/c04-2.jpg"
-]
+"/clarins/c04-v2-1.jpg",
+"/clarins/c04-v2-2.jpg",
+"/clarins/c04-v2-3.jpg"
+],
+"brand": "CLARINS",
+"shades": "03 · 03.5 · 06"
 },
 {
 "id": "c05",
@@ -56,11 +65,14 @@
 "cat": "face",
 "price": 49,
 "cost": 33.1,
-"image": "/clarins/c05.jpg",
+"image": "/clarins/c05-v2-1.jpg",
 "images": [
-"/clarins/c05.jpg",
-"/clarins/c05-2.jpg"
-]
+"/clarins/c05-v2-1.jpg",
+"/clarins/c05-v2-2.jpg",
+"/clarins/c05-v2-3.jpg"
+],
+"brand": "CLARINS",
+"shades": "01 · 02.5 · 03"
 },
 {
 "id": "c06",
@@ -69,10 +81,12 @@
 "cat": "face",
 "price": 42,
 "cost": 28.38,
-"image": "/clarins/c06.jpg",
+"image": "/clarins/c06-v2-1.jpg",
 "images": [
-"/clarins/c06.jpg"
-]
+"/clarins/c06-v2-1.jpg"
+],
+"brand": "CLARINS",
+"shades": "00 · 01 · 03"
 },
 {
 "id": "c07",
@@ -81,10 +95,13 @@
 "cat": "face",
 "price": 53,
 "cost": 35.81,
-"image": "/clarins/c07.jpg",
+"image": "/clarins/c07-v2-1.jpg",
 "images": [
-"/clarins/c07.jpg"
-]
+"/clarins/c07-v2-1.jpg",
+"/clarins/c07-v2-2.jpg"
+],
+"brand": "CLARINS",
+"shades": "01 · 02 · 03 · 05"
 },
 {
 "id": "c08",
@@ -93,10 +110,12 @@
 "cat": "face",
 "price": 56,
 "cost": 37.84,
-"image": "/clarins/c08.jpg",
+"image": "/clarins/c08-v2-1.jpg",
 "images": [
-"/clarins/c08.jpg"
-]
+"/clarins/c08-v2-1.jpg"
+],
+"brand": "CLARINS",
+"shades": "01 · 03"
 },
 {
 "id": "c09",
@@ -105,10 +124,11 @@
 "cat": "face",
 "price": 65,
 "cost": 43.92,
-"image": "/clarins/c09.jpg",
+"image": "/clarins/c09-v2-1.jpg",
 "images": [
-"/clarins/c09.jpg"
-]
+"/clarins/c09-v2-1.jpg"
+],
+"brand": "CLARINS"
 },
 {
 "id": "c10",
@@ -117,10 +137,13 @@
 "cat": "eyes",
 "price": 47,
 "cost": 31.76,
-"image": "/clarins/c10.jpg",
+"image": "/clarins/c10-v2-1.jpg",
 "images": [
-"/clarins/c10.jpg"
-]
+"/clarins/c10-v2-1.jpg",
+"/clarins/c10-v2-2.jpg"
+],
+"brand": "CLARINS",
+"shades": "03 (+ Wonder Volume XXL 01)"
 },
 {
 "id": "c11",
@@ -129,10 +152,11 @@
 "cat": "eyes",
 "price": 48,
 "cost": 32.43,
-"image": "/clarins/c11.jpg",
+"image": "/clarins/c11-v2-1.jpg",
 "images": [
-"/clarins/c11.jpg"
-]
+"/clarins/c11-v2-1.jpg"
+],
+"brand": "CLARINS"
 },
 {
 "id": "c12",
@@ -141,10 +165,13 @@
 "cat": "lips",
 "price": 34,
 "cost": 22.97,
-"image": "/clarins/c12.jpg",
+"image": "/clarins/c12-v2-2.jpg",
 "images": [
-"/clarins/c12.jpg"
-]
+"/clarins/c12-v2-2.jpg",
+"/clarins/c12-v2-1.jpg"
+],
+"brand": "CLARINS",
+"shades": "02 · 04 · 05 · 08 · 09 · 16 · 17 · 21 · 22 · 24"
 },
 {
 "id": "c13",
@@ -153,10 +180,12 @@
 "cat": "lips",
 "price": 35,
 "cost": 23.64,
-"image": "/clarins/c13.jpg",
+"image": "/clarins/c13-v2-1.jpg",
 "images": [
-"/clarins/c13.jpg"
-]
+"/clarins/c13-v2-1.jpg"
+],
+"brand": "CLARINS",
+"shades": "742C · 744C"
 },
 {
 "id": "c14",
@@ -165,6 +194,291 @@
 "cat": "lips",
 "price": 47,
 "cost": 31.76,
+"image": "/clarins/c14-v2-1.jpg",
+"images": [
+"/clarins/c14-v2-1.jpg",
+"/clarins/c14-v2-2.jpg"
+],
+"brand": "CLARINS",
+"shades": "742 · 757"
+},
+{
+"id": "q01",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE EXFOLIATING SCRUB",
+"name": "Exfoliating Scrub 100ml",
+"cat": "cleanse",
+"price": 58,
+"cost": 43.16,
+"image": "/clinique/q01-v2-1.jpg",
+"images": [
+"/clinique/q01-v2-1.jpg"
+]
+},
+{
+"id": "q02",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE CLEANSING OIL DEMAQUILLANTE",
+"name": "Take The Day Off Cleansing Oil 200ml",
+"cat": "cleanse",
+"price": 60,
+"cost": 45.0,
+"image": "/clinique/q02-v2-1.jpg",
+"images": [
+"/clinique/q02-v2-1.jpg"
+]
+},
+{
+"id": "q03",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE ANTI BLEMISH SOLUTION CLEANSING FOAM**",
+"name": "Anti-Blemish Solutions Cleansing Foam",
+"cat": "cleanse",
+"price": 40,
+"cost": 30.0,
+"image": "/clinique/q03-v2-1.jpg",
+"images": [
+"/clinique/q03-v2-1.jpg"
+]
+},
+{
+"id": "q04",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE ANTI-BLEMISH CLEANSING GEL",
+"name": "Anti-Blemish Solutions Cleansing Gel 125ml",
+"cat": "cleanse",
+"price": 42,
+"cost": 31.5,
+"image": "/clinique/q04-v2-1.jpg",
+"images": [
+"/clinique/q04-v2-1.jpg"
+]
+},
+{
+"id": "q05",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE FACIAL CLEANSING MOUSSE 125ML",
+"name": "Take The Day Off Cleansing Mousse 125ml",
+"cat": "cleanse",
+"price": 45,
+"cost": 33.75,
+"image": "/clinique/q05-v2-1.jpg",
+"images": [
+"/clinique/q05-v2-1.jpg"
+]
+},
+{
+"id": "q06",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE BAUME DEMAQUILLANTE AU CHARBON 125ML",
+"name": "Take The Day Off Charcoal Cleansing Balm 125ml",
+"cat": "cleanse",
+"price": 55,
+"cost": 41.25,
+"image": "/clinique/q06-v2-1.jpg",
+"images": [
+"/clinique/q06-v2-1.jpg"
+]
+},
+{
+"id": "q07",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE ALL ABOUT CLEAN 2IN1",
+"name": "All About Clean 2-in-1 Cleansing + Exfoliating Jelly",
+"cat": "cleanse",
+"price": 75,
+"cost": 56.25,
+"image": "/clinique/q07-v2-1.jpg",
+"images": [
+"/clinique/q07-v2-1.jpg"
+]
+},
+{
+"id": "q08",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE CLARIFYING LOTION SECHE /MIXTE 200ML 2.",
+"name": "Clarifying Lotion 2 (dry/combination) 200ml",
+"cat": "cleanse",
+"price": 40,
+"cost": 30.0,
+"image": "/clinique/q08-v2-1.jpg",
+"images": [
+"/clinique/q08-v2-1.jpg"
+]
+},
+{
+"id": "q09",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE CLARIFYING LOTION OILY/MIXTE 3.",
+"name": "Clarifying Lotion 3 (combination/oily) 200ml",
+"cat": "cleanse",
+"price": 40,
+"cost": 30.0,
+"image": "/clinique/q09-v2-1.jpg",
+"images": [
+"/clinique/q09-v2-1.jpg"
+]
+},
+{
+"id": "q10",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE CLARIFYING LOTION OILY 4.",
+"name": "Clarifying Lotion 4 (oily) 200ml",
+"cat": "cleanse",
+"price": 40,
+"cost": 30.0,
+"image": "/clinique/q10-v2-1.jpg",
+"images": [
+"/clinique/q10-v2-1.jpg"
+]
+},
+{
+"id": "q11",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE 7DAY SCRUB CREAM",
+"name": "7 Day Scrub Cream Rinse-Off 100ml",
+"cat": "cleanse",
+"price": 60,
+"cost": 45.0,
+"image": "/clinique/q11-v2-1.jpg",
+"images": [
+"/clinique/q11-v2-1.jpg"
+]
+},
+{
+"id": "q12",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE BLACHEAD SOLUTION",
+"name": "Blackhead Solutions 7 Day Deep Pore Cleanse & Scrub",
+"cat": "cleanse",
+"price": 48,
+"cost": 36.0,
+"image": "/clinique/q12-v2-1.jpg",
+"images": [
+"/clinique/q12-v2-1.jpg"
+]
+},
+{
+"id": "q13",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE MOISTURE SURGE INTENSE 72H 50ML",
+"name": "Moisture Surge Intense 72H 50ml",
+"cat": "treat",
+"price": 63,
+"cost": 47.25,
+"image": "/clinique/q13-v2-1.jpg",
+"images": [
+"/clinique/q13-v2-1.jpg"
+]
+},
+{
+"id": "q14",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE SUPERDEFENSE SPF25",
+"name": "Superdefense SPF25 Multi-Correcting Cream",
+"cat": "treat",
+"price": 85,
+"cost": 63.75,
+"image": "/clinique/q14-v2-1.jpg",
+"images": [
+"/clinique/q14-v2-1.jpg"
+]
+},
+{
+"id": "q15",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE SMART CLINICAL REPAIR SPF30",
+"name": "Smart Clinical Repair SPF30 Wrinkle Cream",
+"cat": "treat",
+"price": 96,
+"cost": 72.0,
+"image": "/clinique/q15-v2-1.jpg",
+"images": [
+"/clinique/q15-v2-1.jpg"
+]
+},
+{
+"id": "q16",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE SMART CLINICAL REPAIR EYE",
+"name": "Smart Clinical Repair Eye Cream",
+"cat": "treat",
+"price": 97,
+"cost": 72.75,
+"image": "/clinique/q16-v2-1.jpg",
+"images": [
+"/clinique/q16-v2-1.jpg"
+]
+},
+{
+"id": "q17",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE CITY BLOCK SHEER 40ML",
+"name": "City Block Sheer SPF25 40ml",
+"cat": "treat",
+"price": 52,
+"cost": 39.0,
+"image": "/clinique/q17-v2-1.jpg",
+"images": [
+"/clinique/q17-v2-1.jpg"
+]
+},
+{
+"id": "q18",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE MOISTURE SURGE SPF25 40ML TEINTE MD",
+"name": "Moisture Surge Sheertint SPF25 — Medium",
+"cat": "treat",
+"price": 58,
+"cost": 43.5,
+"image": "/clinique/q18-v2-1.jpg",
+"images": [
+"/clinique/q18-v2-1.jpg"
+]
+},
+{
+"id": "q19",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE MOISTURE SURGE SPF25 40ML LIGHT",
+"name": "Moisture Surge Sheertint SPF25 — Light",
+"cat": "treat",
+"price": 58,
+"cost": 43.5,
+"image": "/clinique/q19-v2-1.jpg",
+"images": [
+"/clinique/q19-v2-1.jpg"
+]
+},
+{
+"id": "q20",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE MOISTURE MEETS HYDRA/SPF",
+"name": "Moisture Meets Hydra SPF Set",
+"cat": "treat",
+"price": 78,
+"cost": 58.5,
+"image": null,
+"images": []
+},
+{
+"id": "q21",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE GLOW ESSENTIALS MOISTURE COFFRET",
+"name": "Glow Essentials Moisture Gift Set",
+"cat": "treat",
+"price": 106,
+"cost": 79.5,
+"image": null,
+"images": []
+},
+{
+"id": "q22",
+"brand": "CLINIQUE",
+"raw": "CLINIQUE EYES ON THE FLY",
+"name": "Eyes On The Fly Set",
+"cat": "treat",
+"price": 69,
+"cost": 51.75,
 "image": null,
 "images": []
 }

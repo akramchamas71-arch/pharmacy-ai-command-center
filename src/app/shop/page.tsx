@@ -21,7 +21,7 @@ interface AlbumItem { id: string; title: string; image: string; video?: string; 
 const ALBUM = album as AlbumItem[];
 
 interface Product { id: string; name: string; brand: string | null; type: string; available: boolean; price?: number | null }
-interface DItem { id: string; name: string; cat: string; price: number; image: string }
+interface DItem { id: string; name: string; cat: string; price: number; image: string; brand?: string; shades?: string | null; images?: string[] }
 interface CItem { id: string; name: string; type: string; price: number | null; image: string | null; available: boolean }
 interface LItem { id: string; brand: string; brandKey: string; name: string; size: string; price: number; isNew: boolean; image: string | null }
 type CartLine =
@@ -99,6 +99,7 @@ export default function ShopHome() {
   const [kitems, setKitems] = useState<DItem[] | null>(null);
   const [kcat, setKcat] = useState<{ key: string; label: string }[]>([]);
   const [ksel, setKsel] = useState("ALL");
+  const [kview, setKview] = useState<DItem | null>(null);
 
   // drug browse (before searching)
   const [letter, setLetter] = useState("");
@@ -301,7 +302,7 @@ export default function ShopHome() {
         </div>
         {step === "browse" && (
           <div className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4">
-            {([["home", "🏠"], ["consult", t("🩺 استشارة", "🩺 Ask")], ["tips", t("💡 معلومة اليوم", "💡 Daily tip")], ["pharmacy", t("💊 صيدلية", "💊 Pharmacy")], ["cosmetics", t("🧴 كوزماتيك", "🧴 Cosmetics")], ["lattafa", t("✨ لطافة", "✨ Lattafa")], ["deborah", "💄 Deborah"], ["clarins", "🌹 Clarins"], ["album", t("🖼️ ألبوم", "🖼️ Gallery")]] as const).map(([k, label]) => (
+            {([["home", "🏠"], ["consult", t("🩺 استشارة", "🩺 Ask")], ["tips", t("💡 معلومة اليوم", "💡 Daily tip")], ["pharmacy", t("💊 صيدلية", "💊 Pharmacy")], ["cosmetics", t("🧴 كوزماتيك", "🧴 Cosmetics")], ["lattafa", t("✨ لطافة", "✨ Lattafa")], ["deborah", "💄 Deborah"], ["clarins", "🌹 Clarins · Clinique"], ["album", t("🖼️ ألبوم", "🖼️ Gallery")]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`shrink-0 whitespace-nowrap rounded-t-2xl px-3 py-2 text-[13px] font-extrabold ${tab === k ? "bg-slate-50 text-[#7d4650]" : "bg-[#7d4650]/40 text-white"}`}>
                 {label}
@@ -546,24 +547,28 @@ export default function ShopHome() {
 
       {step === "browse" && tab === "clarins" && (
         <main className="flex-1 space-y-3 p-4 pb-28">
-          <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">CLARINS PARIS — {t("من صيدلية فارماكير", "from Pharmacare pharmacy")}</p>
+          <p className="rounded-2xl bg-white p-3 text-center text-sm font-bold text-slate-700">CLARINS PARIS · CLINIQUE — {t("من صيدلية فارماكير", "from Pharmacare pharmacy")}</p>
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
             <button className={chip(ksel === "ALL")} onClick={() => setKsel("ALL")}>{t("الكل", "All")}</button>
+            <button className={chip(ksel === "b:CLARINS")} onClick={() => setKsel("b:CLARINS")}>Clarins</button>
+            <button className={chip(ksel === "b:CLINIQUE")} onClick={() => setKsel("b:CLINIQUE")}>Clinique</button>
             {kcat.map((c) => (
-              <button key={c.key} className={chip(ksel === c.key)} onClick={() => setKsel(c.key)}>{lang === "en" ? DEB_EN[c.key] ?? c.label : c.label}</button>
+              <button key={c.key} className={chip(ksel === c.key)} onClick={() => setKsel(c.key)}>{lang === "en" ? ({ face: "Face", eyes: "Eyes", lips: "Lips", cleanse: "Cleanse", treat: "Treat" } as Record<string, string>)[c.key] ?? c.label : c.label}</button>
             ))}
           </div>
           {kitems === null && <p className="text-center text-sm text-slate-500">{t("جارٍ التحميل...", "Loading...")}</p>}
           <div className="grid grid-cols-2 gap-3">
-            {(kitems ?? []).filter((i) => ksel === "ALL" || i.cat === ksel).map((i) => (
+            {(kitems ?? []).filter((i) => ksel === "ALL" || (ksel.startsWith("b:") ? i.brand === ksel.slice(2) : i.cat === ksel)).map((i) => (
               <div key={i.id} className="flex flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
-                <div className="flex aspect-square items-center justify-center bg-white">
+                <button className="relative flex aspect-square items-center justify-center bg-white" onClick={() => setKview(i)}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-contain" />
-                </div>
+                  <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-cover" />
+                  {(i.images?.length ?? 0) > 1 && <span className="absolute bottom-1 left-1 rounded-full bg-black/50 px-2 text-[11px] text-white">+{(i.images?.length ?? 1) - 1} 📷</span>}
+                </button>
                 <div className="flex flex-1 flex-col gap-1 p-2.5">
-                  <p className="text-[11px] font-bold text-[#9e5f69]">CLARINS</p>
+                  <p className="text-[11px] font-bold text-[#9e5f69]">{i.brand}</p>
                   <p className="line-clamp-2 text-sm font-bold leading-tight text-slate-900" dir="ltr">{i.name}</p>
+                  {i.shades && <p className="text-[11px] text-slate-500" dir="ltr">{t("الدرجات", "Shades")}: {i.shades}</p>}
                   <div className="mt-auto flex items-center justify-between pt-1">
                     <span className="font-extrabold text-slate-900">{usd(i.price)}</span>
                     <button className="rounded-xl border-2 border-ink bg-sun px-2.5 py-1 text-sm font-extrabold" onClick={() => addLine({ kind: "clarins", key: `k-${i.id}`, item: i, qty: 1 })}>+</button>
@@ -572,6 +577,21 @@ export default function ShopHome() {
               </div>
             ))}
           </div>
+          {kview && (
+            <div className="fixed inset-0 z-30 flex flex-col bg-black/90 p-4" onClick={() => setKview(null)}>
+              <div className="flex-1 space-y-3 overflow-auto">
+                {(kview.images?.length ? kview.images : [kview.image]).map((src) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={src} src={src} alt={kview.name} className="mx-auto max-w-full rounded-2xl" />
+                ))}
+              </div>
+              <div className="mx-auto w-full max-w-md space-y-2 pt-3" onClick={(e) => e.stopPropagation()}>
+                <p className="text-center text-sm font-bold text-white" dir="ltr">{kview.brand} {kview.name} — {usd(kview.price)}</p>
+                <button className={`${btn} w-full bg-sun text-ink`} onClick={() => { addLine({ kind: "clarins", key: `k-${kview.id}`, item: kview, qty: 1 }); setKview(null); }}>{t("+ أضف إلى السلة", "+ Add to cart")}</button>
+                <button className="w-full py-2 text-sm font-bold text-white/80" onClick={() => setKview(null)}>{t("إغلاق", "Close")}</button>
+              </div>
+            </div>
+          )}
           <p className="pt-2 text-center text-xs text-slate-500">{t("الدرجات حسب المتوفر في الصيدلية — اكتبي الدرجة المطلوبة (مثل 105N أو 03) في الملاحظات. نؤكد التوفر قبل التوصيل.", "Shades as available — write the shade you want (e.g. 105N or 03) in the notes. We confirm availability before delivery.")}</p>
         </main>
       )}
@@ -624,7 +644,7 @@ export default function ShopHome() {
           {cart.map((l) => (
             <div key={l.key} className="flex items-center justify-between gap-2">
               <p className="min-w-0 truncate text-sm" dir="auto">
-                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : l.kind === "deborah" ? `DEBORAH ${l.item.name} — ${usd(l.item.price)}` : l.kind === "clarins" ? `CLARINS ${l.item.name} — ${usd(l.item.price)}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
+                {l.kind === "pharmacy" ? `${l.product.name}${l.product.price != null ? ` — ${usd(l.product.price)}` : ""}` : l.kind === "deborah" ? `DEBORAH ${l.item.name} — ${usd(l.item.price)}` : l.kind === "clarins" ? `${l.item.brand ?? "CLARINS"} ${l.item.name} — ${usd(l.item.price)}` : `${l.item.name} ${l.item.size} — ${usd(l.item.price)}`}
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <button className="h-8 w-8 rounded-full border-2 border-ink font-bold" onClick={() => setQty(l.key, l.qty - 1)}>−</button>
